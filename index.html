@@ -525,15 +525,24 @@ function setSyncStatus(state,msg){
 async function sheetPost(body){
   if(!sheetURL) return null;
   try{
-    const r=await fetch(sheetURL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
-    return await r.json();
+    // Google Apps Script requires form-encoded POST or GET with params
+    const params=new URLSearchParams();
+    params.append('action', body.action||'');
+    params.append('data', JSON.stringify(body));
+    const r=await fetch(sheetURL, {
+      method:'POST',
+      body:params
+    });
+    const text=await r.text();
+    try{ return JSON.parse(text); }catch{ return {ok:true}; }
   }catch(e){return null;}
 }
 async function sheetGet(){
   if(!sheetURL) return null;
   try{
     const r=await fetch(sheetURL+'?action=get');
-    return await r.json();
+    const text=await r.text();
+    try{ return JSON.parse(text); }catch{ return null; }
   }catch(e){return null;}
 }
 
