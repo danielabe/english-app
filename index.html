@@ -23,7 +23,7 @@
 }
 html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx1);overscroll-behavior:none;}
 body{max-width:430px;margin:0 auto;min-height:100vh;
-  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);}
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 32px);}
 
 .screen{display:none;}
 .screen.active{display:block;animation:rise .22s ease;}
@@ -285,7 +285,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     </div>
   </div>
   <div class="sec-label" style="margin-top:24px;">Últimas palabras</div>
-  <div id="home-recent" class="wlist" style="padding-bottom:8px;"></div>
+  <div id="home-recent" class="wlist" style="padding-bottom:32px;"></div>
 </div>
 
 <!-- VOCAB -->
@@ -310,7 +310,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <span class="chip" onclick="setFilter('adv',this)">adv</span>
     <span class="chip" onclick="setFilter('phrase',this)">frases</span>
   </div>
-  <div id="vocab-list" class="wlist" style="padding-bottom:8px;"></div>
+  <div id="vocab-list" class="wlist" style="padding-bottom:32px;"></div>
 </div>
 
 <!-- ADD -->
@@ -344,19 +344,19 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
       </div>
     </div>
     <div><div class="f-label">Ejemplo</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Frase de ejemplo..."></textarea></div>
-    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Guardar</button>
+    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Guardar</button><div style="height:16px;"></div>
   </div>
   <div id="add-import" style="display:none;padding:0 16px;">
     <div class="import-hint">Pegá el texto del PDF línea por línea:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
     <textarea class="f-inp f-ta" id="imp-text" style="height:160px;" placeholder="abandoned adj /əˈbændənd/ You can usually...&#10;absence n /ˈæbsəns/ Would the Earth..."></textarea>
     <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Importar palabras</button>
-    <div class="import-result" id="imp-result"></div>
+    <div class="import-result" id="imp-result"></div><div style="height:32px;"></div>
   </div>
   <div id="add-frases" style="display:none;padding:0 16px;">
     <div class="import-hint">Pegá las frases en español, una por línea o numeradas:</div>
     <textarea class="f-inp f-ta" id="fras-text" style="height:160px;" placeholder="1. Ella trabaja en una empresa grande...&#10;2. Normalmente no toma decisiones..."></textarea>
     <button class="btn-main" style="margin-top:10px;" onclick="importSentences()">Importar frases</button>
-    <div class="import-result" id="fras-result"></div>
+    <div class="import-result" id="fras-result"></div><div style="height:32px;"></div>
   </div>
 </div>
 
@@ -373,7 +373,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div class="detail-section"><div class="detail-sec-label">En español</div><div class="detail-sec-text" id="d-es"></div></div>
   <div class="detail-section" id="d-ex-wrap"><div class="detail-sec-label">Ejemplo</div><div class="detail-sec-text" id="d-ex"></div></div>
   <div class="detail-section"><div class="detail-sec-label">Estado</div><div class="status-row" id="d-status"></div></div>
-  <button class="btn-danger" onclick="deleteWord()">Eliminar palabra</button>
+  <button class="btn-danger" onclick="deleteWord()">Eliminar palabra</button><div style="height:32px;"></div>
 </div>
 
 <!-- PRACTICE -->
@@ -447,6 +447,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
 </div>
 
+<div style="height:32px;"></div>
 <!-- SYNC MODAL -->
 <div id="sync-modal" class="sync-modal" style="display:none;" onclick="closeSyncModal(event)">
   <div class="sync-modal-box">
