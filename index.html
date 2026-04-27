@@ -1,146 +1,761 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lingo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#40175d">
+<title>Lingo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+:root {
+  /* brand */
+  --pink:    #c169d6;
+  --deep:    #40175d;
+  --deeper:  #64248d;
+  --mid:     #8f53bf;
+  --soft:    #855197;
+  --mist:    #ded8ea;
+  --ink:     #150d0e;
 
-    body {
-      background: #1a0929;
-      color: #fff;
-      max-width: 430px;
-      margin: 0 auto;
-      padding-bottom: 70px;
-    }
+  /* surfaces */
+  --bg:      #1a0929;
+  --surface: #2a1140;
+  --surface2:#341550;
+  --border:  rgba(193,105,214,0.18);
+  --border2: rgba(193,105,214,0.30);
 
-    .header {
-      background: linear-gradient(160deg, #64248d 0%, #40175d 100%);
-      padding: 40px 20px;
-      text-align: center;
-    }
+  /* text */
+  --tx1: #ede8f5;
+  --tx2: #b89eca;
+  --tx3: #7a6390;
 
-    .header h1 {
-      font-size: 28px;
-      color: #fff;
-    }
+  /* feedback */
+  --ok:  #4ade80;
+  --ok2: rgba(74,222,128,0.12);
+  --err: #f87171;
+  --err2:rgba(248,113,113,0.12);
 
-    .header h1 span {
-      color: #c169d6;
-    }
+  --radius: 16px;
+  --radius-sm: 10px;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 20px;
-    }
+html, body { height: 100%; font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--tx1); overscroll-behavior: none; }
+body { max-width: 430px; margin: 0 auto; padding-bottom: 72px; min-height: 100vh; }
 
-    .stat {
-      background: #2a1140;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-    }
+.screen { display: none; }
+.screen.active { display: block; animation: rise 0.22s ease; }
+@keyframes rise { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-    .stat-number {
-      font-size: 24px;
-      color: #c169d6;
-      font-weight: bold;
-    }
+/* ── HEADER ── */
+.hdr {
+  background: linear-gradient(160deg, var(--deeper) 0%, var(--deep) 100%);
+  padding: 52px 22px 40px;
+  position: relative; overflow: hidden;
+}
+.hdr::after { content:''; position:absolute; bottom:-20px; left:0; right:0; height:40px; background:var(--bg); border-radius:50%; }
+.orb { position:absolute; border-radius:50%; pointer-events:none; }
+.hdr-top { display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; margin-bottom:6px; }
+.app-name { font-family:'Playfair Display',serif; font-size:27px; color:var(--tx1); letter-spacing:-0.5px; }
+.app-name em { font-style:italic; color:var(--pink); }
+.hdr-sub { font-size:13px; color:var(--tx2); font-weight:300; position:relative; z-index:1; }
+.hdr-pill { background:rgba(193,105,214,0.2); color:var(--mist); font-size:12px; font-weight:500; padding:5px 13px; border-radius:20px; border:1px solid var(--border2); cursor:pointer; font-family:'Outfit',sans-serif; white-space:nowrap; }
+.hdr-pill:active { background:rgba(193,105,214,0.35); }
 
-    .stat-label {
-      font-size: 12px;
-      color: #b89eca;
-      margin-top: 5px;
-    }
+/* ── STATS ── */
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:36px 16px 12px; }
+.stat { background:var(--surface); border-radius:var(--radius-sm); border:1px solid var(--border); padding:14px 10px 12px; text-align:center; }
+.stat-n { font-size:26px; font-weight:600; color:var(--pink); line-height:1; }
+.stat-l { font-size:11px; color:var(--tx3); margin-top:4px; }
 
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 430px;
-      display: flex;
-      background: #2a1140;
-      border-top: 1px solid rgba(193,105,214,0.2);
-    }
+/* ── LABELS ── */
+.sec-label { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--tx3); padding:0 16px; margin:20px 0 10px; }
 
-    .nav button {
-      flex: 1;
-      padding: 15px;
-      background: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-    }
+/* ── PRACTICE GRID ── */
+.prac-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:0 16px; }
+.prac-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:18px 16px; cursor:pointer; transition:transform 0.13s, background 0.13s; }
+.prac-card:active { transform:scale(0.96); background:var(--surface2); }
+.prac-glyph { width:36px; height:36px; border-radius:10px; background:rgba(193,105,214,0.15); display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+.prac-glyph svg { width:18px; height:18px; stroke:var(--pink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.prac-title { font-size:13px; font-weight:600; color:var(--tx1); margin-bottom:4px; }
+.prac-desc { font-size:11px; color:var(--tx3); line-height:1.5; }
 
-    .nav button:hover {
-      background: #341550;
-    }
-  </style>
+/* ── WORD LIST ── */
+.wlist { padding:0 16px; display:flex; flex-direction:column; gap:8px; }
+.witem { background:var(--surface); border-radius:var(--radius-sm); border:1px solid var(--border); padding:13px 14px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:border-color 0.15s; }
+.witem:active { border-color:var(--pink); }
+.wtype { background:rgba(193,105,214,0.15); color:var(--pink); font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; white-space:nowrap; flex-shrink:0; border:1px solid rgba(193,105,214,0.25); }
+.winfo { flex:1; min-width:0; }
+.wen { font-size:14px; font-weight:500; color:var(--tx1); }
+.wes { font-size:12px; color:var(--tx3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wpron { font-size:10px; color:var(--soft); margin-top:2px; }
+.wchev { color:var(--tx3); font-size:18px; flex-shrink:0; }
+.prog-bar { height:2px; background:var(--surface2); border-radius:2px; margin-top:5px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--pink); border-radius:2px; }
+
+/* ── TABS ── */
+.tabs { display:flex; gap:6px; padding:0 16px; margin-bottom:14px; }
+.tab { flex:1; padding:9px 6px; border:1px solid var(--border); border-radius:8px; background:var(--surface); font-size:13px; color:var(--tx3); cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.15s; }
+.tab.on { background:var(--deeper); color:var(--pink); border-color:var(--border2); font-weight:500; }
+
+/* ── CHIPS ── */
+.chips { display:flex; gap:6px; padding:0 16px 12px; overflow-x:auto; scrollbar-width:none; }
+.chips::-webkit-scrollbar { display:none; }
+.chip { padding:5px 13px; border-radius:20px; font-size:12px; border:1px solid var(--border); background:var(--surface); color:var(--tx3); cursor:pointer; white-space:nowrap; font-family:'Outfit',sans-serif; transition:all 0.15s; flex-shrink:0; }
+.chip.on { background:rgba(193,105,214,0.2); color:var(--pink); border-color:var(--border2); }
+
+/* ── BOTTOM NAV ── */
+.nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:var(--surface); border-top:1px solid var(--border); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
+.nav-btn { flex:1; padding:10px 4px 12px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; border:none; background:none; font-family:'Outfit',sans-serif; transition:background 0.15s; }
+.nav-btn:active { background:rgba(193,105,214,0.1); }
+.nav-icon { width:22px; height:22px; stroke:var(--tx3); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:stroke 0.15s; }
+.nav-btn.on .nav-icon { stroke:var(--pink); }
+.nav-lbl { font-size:10px; color:var(--tx3); transition:color 0.15s; }
+.nav-btn.on .nav-lbl { color:var(--pink); font-weight:600; }
+.nav-dot { width:4px; height:4px; border-radius:50%; background:var(--pink); display:none; }
+.nav-btn.on .nav-dot { display:block; }
+
+/* ── PRACTICE SCREEN ── */
+.prac-hdr { background:var(--surface); padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.back-btn { width:36px; height:36px; border-radius:10px; border:1px solid var(--border); background:var(--surface2); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.back-btn svg { width:18px; height:18px; stroke:var(--tx2); fill:none; stroke-width:2; stroke-linecap:round; }
+.prac-hdr-title { font-size:16px; font-weight:600; flex:1; color:var(--tx1); }
+.prac-count { font-size:13px; color:var(--tx3); }
+.prog-strip { height:3px; background:var(--surface2); }
+.prog-strip-fill { height:3px; background:var(--pink); transition:width 0.4s ease; }
+
+.prac-body { padding:24px 18px; }
+.q-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--tx3); margin-bottom:10px; }
+.q-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px 22px; text-align:center; margin-bottom:20px; }
+.q-word { font-family:'Playfair Display',serif; font-size:30px; color:var(--mist); margin-bottom:6px; line-height:1.2; }
+.q-sub { font-size:12px; color:var(--soft); }
+
+.ans-inp { width:100%; padding:15px 16px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:16px; font-family:'Outfit',sans-serif; color:var(--tx1); background:var(--surface); outline:none; margin-bottom:12px; transition:border-color 0.2s; }
+.ans-inp:focus { border-color:var(--pink); }
+.ans-inp.ok { border-color:var(--ok); background:var(--ok2); }
+.ans-inp.err { border-color:var(--err); background:var(--err2); }
+.ans-ta { resize:none; height:90px; }
+
+.btn-main { width:100%; padding:15px; background:var(--deeper); color:var(--pink); border:1.5px solid var(--border2); border-radius:var(--radius-sm); font-size:15px; font-weight:600; font-family:'Outfit',sans-serif; cursor:pointer; transition:all 0.15s; margin-bottom:8px; }
+.btn-main:active { background:var(--deep); }
+.btn-out { width:100%; padding:13px; background:transparent; color:var(--tx2); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:14px; font-weight:500; font-family:'Outfit',sans-serif; cursor:pointer; transition:all 0.15s; display:none; }
+.btn-out:active { background:var(--surface2); }
+
+/* ── FLIP ── */
+.flip-wrap { perspective:1000px; margin-bottom:20px; cursor:pointer; }
+.flip-card { width:100%; min-height:160px; position:relative; transform-style:preserve-3d; transition:transform 0.45s; border-radius:var(--radius); }
+.flip-card.flipped { transform:rotateY(180deg); }
+.flip-face { position:absolute; width:100%; min-height:160px; backface-visibility:hidden; border-radius:var(--radius); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 22px; text-align:center; }
+.flip-front { background:var(--surface); }
+.flip-back { background:var(--surface2); transform:rotateY(180deg); }
+.flip-hint { font-size:11px; color:var(--tx3); margin-top:12px; }
+
+.eval-row { display:flex; gap:10px; margin-bottom:14px; }
+.eval-btn { flex:1; padding:13px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.15s; border:1.5px solid; }
+.eval-knew { border-color:var(--ok); color:var(--ok); background:transparent; }
+.eval-knew:active { background:var(--ok2); }
+.eval-forgot { border-color:var(--err); color:var(--err); background:transparent; }
+.eval-forgot:active { background:var(--err2); }
+
+/* ── AI BOX ── */
+.ai-box { background:var(--surface2); border-radius:var(--radius-sm); border:1px solid var(--border2); padding:14px 16px; margin-bottom:12px; display:none; }
+.ai-box.show { display:block; animation:rise 0.25s ease; }
+.ai-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--pink); margin-bottom:6px; }
+.ai-text { font-size:13px; color:var(--tx1); line-height:1.7; }
+.dots { display:flex; gap:5px; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--pink); animation:bob 1.1s infinite; }
+.dot:nth-child(2){animation-delay:0.18s} .dot:nth-child(3){animation-delay:0.36s}
+@keyframes bob{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* ── FORMS ── */
+.form-wrap { padding:0 16px; display:flex; flex-direction:column; gap:12px; }
+.f-label { font-size:11px; font-weight:600; color:var(--tx3); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em; }
+.f-inp { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:14px; font-family:'Outfit',sans-serif; color:var(--tx1); background:var(--surface); outline:none; }
+.f-inp::placeholder { color:var(--tx3); }
+.f-inp:focus { border-color:var(--pink); }
+.f-ta { resize:none; height:80px; }
+.pill-row { display:flex; gap:6px; flex-wrap:wrap; }
+.type-pill { padding:6px 14px; border-radius:20px; border:1px solid var(--border); font-size:12px; cursor:pointer; background:var(--surface); color:var(--tx3); font-family:'Outfit',sans-serif; transition:all 0.15s; }
+.type-pill.on { background:rgba(193,105,214,0.2); color:var(--pink); border-color:var(--border2); }
+.import-hint { font-size:12px; color:var(--tx3); line-height:1.7; margin-bottom:10px; background:var(--surface); padding:12px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); }
+.import-hint code { font-size:11px; color:var(--pink); background:rgba(193,105,214,0.15); padding:1px 5px; border-radius:4px; }
+.import-result { font-size:13px; color:var(--pink); text-align:center; margin-top:10px; font-weight:500; }
+
+/* ── DETAIL ── */
+.detail-hdr { text-align:center; padding:30px 20px 20px; }
+.detail-word { font-family:'Playfair Display',serif; font-size:34px; color:var(--mist); }
+.detail-pron { font-size:14px; color:var(--soft); margin:4px 0 10px; }
+.detail-type { display:inline-block; background:rgba(193,105,214,0.15); color:var(--pink); font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; border:1px solid var(--border2); }
+.detail-section { background:var(--surface); border-radius:var(--radius-sm); border:1px solid var(--border); padding:14px 16px; margin:0 16px 10px; }
+.detail-sec-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--tx3); margin-bottom:6px; }
+.detail-sec-text { font-size:14px; color:var(--tx1); line-height:1.65; }
+.status-row { display:flex; gap:8px; }
+.status-btn { flex:1; padding:10px; border-radius:var(--radius-sm); border:1.5px solid; font-size:13px; font-weight:500; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.15s; }
+.status-learning { border-color:var(--border2); color:var(--tx2); background:transparent; }
+.status-learned { border-color:rgba(74,222,128,0.4); color:var(--ok); background:transparent; }
+.status-btn.active-s { background:var(--deeper); color:var(--pink); border-color:var(--border2); }
+.btn-danger { width:calc(100% - 32px); margin:8px 16px; padding:13px; background:transparent; color:var(--err); border:1px solid rgba(248,113,113,0.3); border-radius:var(--radius-sm); font-size:14px; font-weight:500; cursor:pointer; font-family:'Outfit',sans-serif; }
+
+/* ── RESULT ── */
+.result-wrap { padding:60px 24px 40px; text-align:center; }
+.result-icon { width:80px; height:80px; border-radius:50%; background:rgba(193,105,214,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; border:1px solid var(--border2); }
+.result-icon svg { width:36px; height:36px; stroke:var(--pink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.result-title { font-family:'Playfair Display',serif; font-size:30px; color:var(--mist); margin-bottom:6px; }
+.result-sub { font-size:15px; color:var(--tx3); margin-bottom:36px; }
+.result-nums { display:flex; justify-content:center; gap:40px; margin-bottom:36px; }
+.result-num { font-size:32px; font-weight:600; color:var(--pink); line-height:1; }
+.result-numlabel { font-size:12px; color:var(--tx3); margin-top:4px; }
+
+/* ── SETTINGS ── */
+.settings-section { padding:0 16px; margin-bottom:20px; }
+.settings-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.settings-row { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; cursor:pointer; }
+.settings-row:last-child { border-bottom:none; }
+.settings-row:active { background:var(--surface2); }
+.settings-row-icon { width:32px; height:32px; border-radius:9px; background:rgba(193,105,214,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.settings-row-icon svg { width:16px; height:16px; stroke:var(--pink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.settings-row-text { flex:1; }
+.settings-row-title { font-size:14px; font-weight:500; color:var(--tx1); }
+.settings-row-sub { font-size:12px; color:var(--tx3); margin-top:1px; }
+.settings-row-arrow { color:var(--tx3); }
+
+/* ── SYNC MODAL ── */
+.sync-modal { position:fixed; inset:0; background:rgba(21,13,14,0.75); z-index:300; display:flex; align-items:flex-end; justify-content:center; }
+.sync-modal-box { background:var(--surface); border-radius:20px 20px 0 0; padding:28px 20px 40px; width:100%; max-width:430px; animation:slideup 0.3s ease; border-top:1px solid var(--border2); }
+@keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sync-modal-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--mist); margin-bottom:8px; }
+.sync-modal-sub { font-size:13px; color:var(--tx3); margin-bottom:20px; line-height:1.6; }
+.sync-step { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; }
+.sync-step-num { width:22px; height:22px; border-radius:50%; background:rgba(193,105,214,0.2); color:var(--pink); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; border:1px solid var(--border2); }
+.sync-step-text { font-size:13px; color:var(--tx2); line-height:1.5; }
+.sync-url-inp { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13px; font-family:'Outfit',sans-serif; color:var(--tx1); background:var(--surface2); outline:none; margin-bottom:10px; }
+.sync-url-inp:focus { border-color:var(--pink); }
+.sync-url-inp::placeholder { color:var(--tx3); }
+
+/* ── EMPTY / TOAST ── */
+.empty { text-align:center; padding:48px 24px; color:var(--tx3); }
+.empty-icon { width:56px; height:56px; border-radius:50%; background:rgba(193,105,214,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.empty-icon svg { width:24px; height:24px; stroke:var(--soft); fill:none; stroke-width:1.8; stroke-linecap:round; }
+.empty-text { font-size:14px; }
+
+.toast { position:fixed; bottom:84px; left:50%; transform:translateX(-50%) translateY(12px); background:var(--surface2); color:var(--tx1); border:1px solid var(--border2); padding:10px 20px; border-radius:20px; font-size:13px; opacity:0; transition:all 0.25s; pointer-events:none; white-space:nowrap; z-index:500; max-width:90%; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* sentence card */
+.sent-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
+.sent-es { font-size:15px; color:var(--tx1); line-height:1.7; }
+.sent-hint { font-size:11px; color:var(--tx3); margin-top:6px; }
+</style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Lin<span>go</span></h1>
-  </div>
+<div id="toast" class="toast"></div>
 
+<!-- ══ HOME ══ -->
+<div id="s-home" class="screen active">
+  <div class="hdr">
+    <div class="orb" style="width:130px;height:130px;top:-50px;right:-40px;background:rgba(193,105,214,0.12);"></div>
+    <div class="orb" style="width:60px;height:60px;bottom:20px;left:16px;background:rgba(143,83,191,0.15);"></div>
+    <div class="hdr-top">
+      <span class="app-name">Lin<em>go</em></span>
+      <span id="streak-pill" class="hdr-pill">🔥 0 días</span>
+    </div>
+    <div class="hdr-sub">Hola! ¿Practicamos hoy?</div>
+  </div>
   <div class="stats">
-    <div class="stat">
-      <div class="stat-number" id="st-total">0</div>
-      <div class="stat-label">Palabras</div>
+    <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Palabras</div></div>
+    <div class="stat"><div class="stat-n" id="st-learned">0</div><div class="stat-l">Aprendidas</div></div>
+    <div class="stat"><div class="stat-n" id="st-sentences">0</div><div class="stat-l">Frases</div></div>
+  </div>
+  <div class="sec-label">Practicar</div>
+  <div class="prac-grid">
+    <div class="prac-card" onclick="startMode('es-en')">
+      <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M5 8l6 6M4 6h7M2 4h9M15 5h5l-5 14M19 9h-3"/></svg></div>
+      <div class="prac-title">ESP → ING</div>
+      <div class="prac-desc">Ves en español, escribís en inglés</div>
     </div>
-    <div class="stat">
-      <div class="stat-number" id="st-learned">0</div>
-      <div class="stat-label">Aprendidas</div>
+    <div class="prac-card" onclick="startMode('recall')">
+      <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+      <div class="prac-title">¿Lo sabés?</div>
+      <div class="prac-desc">Tarjeta que se da vuelta</div>
     </div>
-    <div class="stat">
-      <div class="stat-number" id="st-sentences">0</div>
-      <div class="stat-label">Frases</div>
+    <div class="prac-card" onclick="startMode('sentences')">
+      <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="prac-title">Traducir frase</div>
+      <div class="prac-desc">Del español al inglés</div>
+    </div>
+    <div class="prac-card" onclick="startMode('fill')">
+      <div class="prac-glyph"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h2M13 15h4"/></svg></div>
+      <div class="prac-title">Completar</div>
+      <div class="prac-desc">Completá el espacio en blanco</div>
     </div>
   </div>
+  <div class="sec-label" style="margin-top:24px;">Últimas palabras</div>
+  <div id="home-recent" class="wlist" style="padding-bottom:8px;"></div>
+</div>
 
-  <div class="nav">
-    <button>Inicio</button>
-    <button>Vocabulario</button>
-    <button>Agregar</button>
-    <button>Ajustes</button>
+<!-- ══ VOCAB ══ -->
+<div id="s-vocab" class="screen">
+  <div class="hdr">
+    <div class="hdr-top">
+      <span class="app-name">Vocabulario</span>
+      <button class="hdr-pill" onclick="showScreen('s-add')">+ Agregar</button>
+    </div>
+    <div class="hdr-sub">Tus palabras y frases</div>
   </div>
+  <div style="height:32px;"></div>
+  <div class="tabs">
+    <button class="tab on" onclick="setVocabTab('learning',this)">Por aprender</button>
+    <button class="tab" onclick="setVocabTab('learned',this)">Aprendidas</button>
+  </div>
+  <div class="chips">
+    <span class="chip on" onclick="setFilter('all',this)">Todas</span>
+    <span class="chip" onclick="setFilter('adj',this)">adj</span>
+    <span class="chip" onclick="setFilter('n',this)">n</span>
+    <span class="chip" onclick="setFilter('v',this)">v</span>
+    <span class="chip" onclick="setFilter('adv',this)">adv</span>
+    <span class="chip" onclick="setFilter('phrase',this)">frases</span>
+  </div>
+  <div id="vocab-list" class="wlist" style="padding-bottom:8px;"></div>
+</div>
 
-  <script>
-    const words = [
-      { en: 'abandoned', status: 'learning' },
-      { en: 'absence', status: 'learning' },
-      { en: 'accompany', status: 'learned' }
-    ];
+<!-- ══ ADD ══ -->
+<div id="s-add" class="screen">
+  <div class="hdr">
+    <div class="hdr-top">
+      <button class="hdr-pill" onclick="goBack()">← Volver</button>
+      <span class="app-name" style="font-size:20px;">Agregar</span>
+    </div>
+    <div class="hdr-sub">Nuevas palabras o importar</div>
+  </div>
+  <div style="height:28px;"></div>
+  <div class="tabs" id="add-tabs">
+    <button class="tab on" onclick="setAddTab('manual',this)">A mano</button>
+    <button class="tab" onclick="setAddTab('import',this)">Importar</button>
+    <button class="tab" onclick="setAddTab('frases',this)">Frases</button>
+  </div>
+  <div id="add-manual" class="form-wrap">
+    <div><div class="f-label">Palabra en inglés *</div><input class="f-inp" id="f-en" placeholder="ej: abandoned"/></div>
+    <div><div class="f-label">Traducción</div><input class="f-inp" id="f-es" placeholder="ej: abandonado/a"/></div>
+    <div><div class="f-label">Pronunciación</div><input class="f-inp" id="f-pron" placeholder="ej: /əˈbændənd/"/></div>
+    <div>
+      <div class="f-label">Tipo</div>
+      <div class="pill-row">
+        <span class="type-pill on" onclick="selType(this,'adj')">adj</span>
+        <span class="type-pill" onclick="selType(this,'n')">n</span>
+        <span class="type-pill" onclick="selType(this,'v')">v</span>
+        <span class="type-pill" onclick="selType(this,'adv')">adv</span>
+        <span class="type-pill" onclick="selType(this,'phrase')">frase</span>
+        <span class="type-pill" onclick="selType(this,'other')">otro</span>
+      </div>
+    </div>
+    <div><div class="f-label">Ejemplo</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Frase de ejemplo..."></textarea></div>
+    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Guardar</button>
+  </div>
+  <div id="add-import" style="display:none;padding:0 16px;">
+    <div class="import-hint">Pegá el texto del PDF línea por línea:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
+    <textarea class="f-inp f-ta" id="imp-text" style="height:160px;" placeholder="abandoned adj /əˈbændənd/ You can usually...&#10;absence n /ˈæbsəns/ Would the Earth..."></textarea>
+    <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Importar palabras</button>
+    <div class="import-result" id="imp-result"></div>
+  </div>
+  <div id="add-frases" style="display:none;padding:0 16px;">
+    <div class="import-hint">Pegá las frases en español, una por línea o numeradas:</div>
+    <textarea class="f-inp f-ta" id="fras-text" style="height:160px;" placeholder="1. Ella trabaja en una empresa grande...&#10;2. Normalmente no toma decisiones..."></textarea>
+    <button class="btn-main" style="margin-top:10px;" onclick="importSentences()">Importar frases</button>
+    <div class="import-result" id="fras-result"></div>
+  </div>
+</div>
 
-    const sentences = [
-      { es: 'Ella trabaja en una empresa grande.' },
-      { es: 'A veces le cuesta concentrarse.' }
-    ];
+<!-- ══ DETAIL ══ -->
+<div id="s-detail" class="screen">
+  <div class="hdr" style="padding-bottom:28px;">
+    <button class="hdr-pill" onclick="goBack()">← Volver</button>
+  </div>
+  <div class="detail-hdr">
+    <div class="detail-word" id="d-word"></div>
+    <div class="detail-pron" id="d-pron"></div>
+    <span class="detail-type" id="d-type"></span>
+  </div>
+  <div class="detail-section"><div class="detail-sec-label">En español</div><div class="detail-sec-text" id="d-es"></div></div>
+  <div class="detail-section" id="d-ex-wrap"><div class="detail-sec-label">Ejemplo</div><div class="detail-sec-text" id="d-ex"></div></div>
+  <div class="detail-section"><div class="detail-sec-label">Estado</div><div class="status-row" id="d-status"></div></div>
+  <button class="btn-danger" onclick="deleteWord()">Eliminar palabra</button>
+</div>
 
-    function updateStats() {
-      document.getElementById('st-total').textContent = words.length;
-      document.getElementById('st-learned').textContent =
-        words.filter(w => w.status === 'learned').length;
-      document.getElementById('st-sentences').textContent = sentences.length;
-    }
+<!-- ══ PRACTICE ══ -->
+<div id="s-practice" class="screen">
+  <div class="prac-hdr">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <span class="prac-hdr-title" id="p-title">Practicar</span>
+    <span class="prac-count" id="p-count">1/10</span>
+  </div>
+  <div class="prog-strip"><div class="prog-strip-fill" id="p-prog" style="width:0%"></div></div>
+  <div class="prac-body" id="p-body"></div>
+</div>
 
-    function load() {
-      updateStats();
-    }
+<!-- ══ RESULT ══ -->
+<div id="s-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="result-title" id="r-title">¡Muy bien!</div>
+    <div class="result-sub" id="r-sub">Completaste la sesión</div>
+    <div class="result-nums">
+      <div><div class="result-num" id="r-correct">—</div><div class="result-numlabel">Correctas</div></div>
+      <div><div class="result-num" id="r-total">—</div><div class="result-numlabel">Total</div></div>
+    </div>
+    <button class="btn-main" onclick="showScreen('s-home')">Volver al inicio</button>
+    <button class="btn-out" style="display:block;" onclick="startSameMode()">Practicar de nuevo</button>
+  </div>
+</div>
 
-    load();
-  </script>
+<!-- ══ SETTINGS ══ -->
+<div id="s-settings" class="screen">
+  <div class="hdr">
+    <div class="hdr-top"><span class="app-name">Ajustes</span></div>
+    <div class="hdr-sub">Configuración y datos</div>
+  </div>
+  <div style="height:32px;"></div>
+  <div class="sec-label">Google Sheets</div>
+  <div class="settings-section">
+    <div class="settings-card">
+      <div class="settings-row" onclick="openSyncModal()">
+        <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
+        <div class="settings-row-text"><div class="settings-row-title">Conectar Google Sheets</div><div class="settings-row-sub" id="sheet-status-label">No conectado</div></div>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="syncNow()">
+        <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <div class="settings-row-text"><div class="settings-row-title">Sincronizar ahora</div><div class="settings-row-sub">Subir palabras a tu Sheet</div></div>
+        <span class="settings-row-arrow">›</span>
+      </div>
+    </div>
+  </div>
+  <div class="sec-label">Datos locales</div>
+  <div class="settings-section">
+    <div class="settings-card">
+      <div class="settings-row" onclick="exportData()">
+        <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <div class="settings-row-text"><div class="settings-row-title">Exportar como JSON</div><div class="settings-row-sub">Copia de seguridad de tus datos</div></div>
+        <span class="settings-row-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="document.getElementById('json-inp').click()">
+        <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="settings-row-text"><div class="settings-row-title">Importar JSON</div><div class="settings-row-sub">Restaurar desde copia de seguridad</div></div>
+        <span class="settings-row-arrow">›</span>
+      </div>
+    </div>
+    <input type="file" id="json-inp" accept=".json" style="display:none;" onchange="importJSON(event)">
+  </div>
+</div>
 
+<!-- ══ SYNC MODAL ══ -->
+<div id="sync-modal" class="sync-modal" style="display:none;" onclick="closeSyncModal(event)">
+  <div class="sync-modal-box">
+    <div class="sync-modal-title">Conectar Google Sheets</div>
+    <div class="sync-modal-sub">Seguí estos pasos una sola vez para conectar tu Sheet.</div>
+    <div class="sync-step"><div class="sync-step-num">1</div><div class="sync-step-text">Creá un Google Sheet con columnas: <strong>en, es, pron, type, example, status</strong></div></div>
+    <div class="sync-step"><div class="sync-step-num">2</div><div class="sync-step-text">Extensiones → Apps Script → pegá el contenido de <strong>script.gs</strong> → Guardar</div></div>
+    <div class="sync-step"><div class="sync-step-num">3</div><div class="sync-step-text">Implementar → Nueva implementación → Aplicación web → Acceso: <strong>Cualquier persona</strong> → Copiar URL</div></div>
+    <div class="sync-step"><div class="sync-step-num">4</div><div class="sync-step-text">Pegá la URL acá abajo:</div></div>
+    <input class="sync-url-inp" id="sheet-url-inp" placeholder="https://script.google.com/macros/s/..."/>
+    <button class="btn-main" onclick="saveSheetURL()">Guardar y conectar</button>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav" id="main-nav">
+  <button class="nav-btn on" id="nav-home" onclick="showScreen('s-home')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-lbl">Inicio</span><span class="nav-dot"></span>
+  </button>
+  <button class="nav-btn" id="nav-vocab" onclick="showScreen('s-vocab')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span class="nav-lbl">Vocabulario</span><span class="nav-dot"></span>
+  </button>
+  <button class="nav-btn" id="nav-add" onclick="showScreen('s-add')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span class="nav-lbl">Agregar</span><span class="nav-dot"></span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showScreen('s-settings')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="nav-lbl">Ajustes</span><span class="nav-dot"></span>
+  </button>
+</nav>
+
+<script>
+const WK='lingo_words', SK='lingo_sentences', SHEETK='lingo_sheet_url';
+let words=[], sentences=[], sheetURL='', lastScreen='s-home';
+let vocabTab='learning', typeFilter='all', selWordType='adj';
+let curDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorrect=0;
+
+function lsJ(k,v){if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}}
+function ls(k,v){if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';}
+
+function load(){
+  words=lsJ(WK)||sampleWords();
+  sentences=lsJ(SK)||sampleSentences();
+  sheetURL=ls(SHEETK);
+  if(sheetURL)document.getElementById('sheet-status-label').textContent='Conectado ✓';
+  updateStats();renderHomeRecent();renderVocab();
+}
+function save(){lsJ(WK,words);lsJ(SK,sentences);}
+
+function sampleWords(){return[
+  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning'},
+  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',example:'Would the Earth survive without the moon?',status:'learning'},
+  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',example:'There is a central heating system that can access the GPS in your mobile phone.',status:'learning'},
+  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning'},
+  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',example:'Mary Kingsley could accompany her father on his travels.',status:'learned'},
+];}
+function sampleSentences(){return[
+  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning'},
+  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning'},
+  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning'},
+  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning'},
+  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning'},
+];}
+
+function showScreen(id){
+  const isPrac=id==='s-practice'||id==='s-result';
+  document.getElementById('main-nav').style.display=isPrac?'none':'flex';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(!isPrac){
+    ['nav-home','nav-vocab','nav-add','nav-settings'].forEach(n=>document.getElementById(n).classList.remove('on'));
+    const m={'s-home':'nav-home','s-vocab':'nav-vocab','s-add':'nav-add','s-settings':'nav-settings'};
+    if(m[id])document.getElementById(m[id]).classList.add('on');
+    lastScreen=id;
+  }
+  if(id==='s-vocab')renderVocab();
+  if(id==='s-home'){updateStats();renderHomeRecent();}
+}
+function goBack(){showScreen(lastScreen);}
+
+function updateStats(){
+  document.getElementById('st-total').textContent=words.length;
+  document.getElementById('st-learned').textContent=words.filter(w=>w.status==='learned').length;
+  document.getElementById('st-sentences').textContent=sentences.length;
+}
+
+function wHTML(w){
+  const pct=w.status==='learned'?100:25;
+  return `<div class="witem" onclick="showDetail(${w.id})">
+    <span class="wtype">${w.type}</span>
+    <div class="winfo">
+      <div class="wen">${w.en}</div>
+      <div class="wes">${w.es||'—'}</div>
+      ${w.pron?`<div class="wpron">${w.pron}</div>`:''}
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>
+    <span class="wchev">›</span>
+  </div>`;
+}
+
+function renderHomeRecent(){
+  const el=document.getElementById('home-recent');
+  const r=[...words].reverse().slice(0,4);
+  el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Agregá tus primeras palabras</div></div>`;
+}
+function renderVocab(){
+  const el=document.getElementById('vocab-list');
+  let list=words.filter(w=>w.status===vocabTab);
+  if(typeFilter!=='all')list=list.filter(w=>w.type===typeFilter);
+  el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No hay palabras aquí todavía</div></div>`;
+}
+
+function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
+function setFilter(f,el){typeFilter=f;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
+
+function showDetail(id){
+  const w=words.find(x=>x.id===id);if(!w)return;
+  curDetailId=id;
+  lastScreen=document.querySelector('.screen.active').id;
+  document.getElementById('d-word').textContent=w.en;
+  document.getElementById('d-pron').textContent=w.pron||'';
+  document.getElementById('d-type').textContent=w.type;
+  document.getElementById('d-es').textContent=w.es||'—';
+  document.getElementById('d-ex').textContent=w.example||'—';
+  document.getElementById('d-ex-wrap').style.display=w.example?'block':'none';
+  document.getElementById('d-status').innerHTML=`
+    <button class="status-btn status-learning ${w.status==='learning'?'active-s':''}" onclick="setStatus('learning')">Por aprender</button>
+    <button class="status-btn status-learned ${w.status==='learned'?'active-s':''}" onclick="setStatus('learned')">Aprendida ✓</button>`;
+  showScreen('s-detail');
+}
+function setStatus(s){const w=words.find(x=>x.id===curDetailId);if(!w)return;w.status=s;save();showDetail(curDetailId);showToast(s==='learned'?'✓ Marcada como aprendida':'Movida a por aprender');}
+function deleteWord(){words=words.filter(w=>w.id!==curDetailId);save();goBack();showToast('Palabra eliminada');}
+
+function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function setAddTab(tab,btn){
+  ['add-manual','add-import','add-frases'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('add-'+tab).style.display=tab==='manual'?'flex':'block';
+  document.querySelectorAll('#add-tabs .tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function addManual(){
+  const en=document.getElementById('f-en').value.trim();if(!en){showToast('Escribí la palabra en inglés');return;}
+  words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,example:document.getElementById('f-ex').value.trim(),status:'learning'});
+  save();updateStats();['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');showToast('✓ Palabra guardada');
+}
+function importWords(){
+  const text=document.getElementById('imp-text').value.trim();if(!text)return;
+  let count=0;
+  text.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
+    const m=line.match(/^(\S+)\s+(adj|adv|n|v|phr|phrase)\s+(\/[^/]+\/)?\s*(.*)$/i);
+    if(m){words.push({id:Date.now()+count,en:m[1],type:m[2].toLowerCase(),pron:m[3]?m[3].trim():'',example:m[4].trim(),es:'',status:'learning'});count++;}
+    else if(line.length>2){const p=line.split(/\s+/);words.push({id:Date.now()+count,en:p[0],type:'n',pron:'',example:p.slice(1).join(' '),es:'',status:'learning'});count++;}
+  });
+  save();updateStats();document.getElementById('imp-result').textContent=`✓ ${count} palabras importadas`;document.getElementById('imp-text').value='';showToast(`✓ ${count} palabras importadas`);
+}
+function importSentences(){
+  const text=document.getElementById('fras-text').value.trim();if(!text)return;
+  let count=0;
+  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning'});count++;});
+  lsJ(SK,sentences);updateStats();document.getElementById('fras-result').textContent=`✓ ${count} frases importadas`;document.getElementById('fras-text').value='';showToast(`✓ ${count} frases importadas`);
+}
+
+function startMode(mode){
+  pMode=mode;pIdx=0;pCorrect=0;
+  const names={'es-en':'ESP → ING','recall':'¿Lo sabés?','sentences':'Traducir frases','fill':'Completar frase'};
+  document.getElementById('p-title').textContent=names[mode]||mode;
+  if(mode==='sentences'){
+    pQueue=sentences.filter(s=>s.status==='learning').sort(()=>Math.random()-0.5).slice(0,8);
+    if(!pQueue.length){showToast('No hay frases. Importá algunas primero.');return;}
+  }else if(mode==='fill'){
+    pQueue=words.filter(w=>w.example&&w.status==='learning').sort(()=>Math.random()-0.5).slice(0,8);
+    if(!pQueue.length){showToast('Necesitás palabras con ejemplos para este modo.');return;}
+  }else{
+    pQueue=words.filter(w=>w.status==='learning').sort(()=>Math.random()-0.5).slice(0,10);
+    if(!pQueue.length)pQueue=[...words].sort(()=>Math.random()-0.5).slice(0,10);
+    if(!pQueue.length){showToast('Agregá palabras para practicar.');return;}
+  }
+  lastScreen='s-home';showScreen('s-practice');renderQ();
+}
+function startSameMode(){if(pMode)startMode(pMode);}
+
+function renderQ(){
+  if(pIdx>=pQueue.length){showResults();return;}
+  const item=pQueue[pIdx];
+  document.getElementById('p-prog').style.width=Math.round((pIdx/pQueue.length)*100)+'%';
+  document.getElementById('p-count').textContent=`${pIdx+1}/${pQueue.length}`;
+  let html='';
+  if(pMode==='es-en'){
+    html=`<div class="q-label">¿Cómo se dice en inglés?</div>
+    <div class="q-card"><div class="q-word">${item.es||item.en}</div>${item.type?`<div class="q-sub">${item.type}</div>`:''}</div>
+    <input class="ans-inp" id="a-inp" placeholder="Escribí en inglés..." onkeydown="if(event.key==='Enter')checkWord()"/>
+    <div class="ai-box" id="ai-box"><div class="ai-label">Corrección</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkWord()">Verificar</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+  }else if(pMode==='recall'){
+    html=`<div class="q-label">¿Sabés qué significa?</div>
+    <div class="flip-wrap" onclick="doFlip()">
+      <div class="flip-card" id="flip-card">
+        <div class="flip-face flip-front"><div class="q-word">${item.en}</div><div class="q-sub">${item.type||''} ${item.pron||''}</div><div class="flip-hint">Tocá para ver el significado</div></div>
+        <div class="flip-face flip-back"><div class="q-word" style="font-size:22px;">${item.es||'—'}</div>${item.example?`<div style="font-size:12px;color:var(--tx3);margin-top:10px;line-height:1.5;">${item.example}</div>`:''}</div>
+      </div>
+    </div>
+    <div class="eval-row" id="eval-row" style="display:none;">
+      <button class="eval-btn eval-forgot" onclick="selfEval(false)">No lo sabía</button>
+      <button class="eval-btn eval-knew" onclick="selfEval(true)">Lo sabía ✓</button>
+    </div>`;
+  }else if(pMode==='sentences'){
+    html=`<div class="q-label">Traducí al inglés:</div>
+    <div class="sent-card"><div class="sent-es">${item.es}</div><div class="sent-hint">Escribí lo mejor que puedas</div></div>
+    <textarea class="ans-inp ans-ta" id="a-inp" placeholder="Your translation here..."></textarea>
+    <div class="ai-box" id="ai-box"><div class="ai-label">Corrección IA</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkSentence()">Enviar para corrección</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+  }else if(pMode==='fill'){
+    const blank=item.example.replace(new RegExp(`\\b${item.en}\\b`,'i'),'______');
+    html=`<div class="q-label">Completá la frase:</div>
+    <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${item.type} ${item.pron||''}</div></div>
+    <input class="ans-inp" id="a-inp" placeholder="La palabra que falta..." onkeydown="if(event.key==='Enter')checkFill()"/>
+    <div class="ai-box" id="ai-box"><div class="ai-label">Resultado</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkFill()">Verificar</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+  }
+  document.getElementById('p-body').innerHTML=html;
+  if(document.getElementById('a-inp'))setTimeout(()=>document.getElementById('a-inp').focus(),100);
+}
+
+function doFlip(){document.getElementById('flip-card').classList.add('flipped');document.getElementById('eval-row').style.display='flex';}
+function selfEval(knew){if(knew)pCorrect++;nextQ();}
+
+async function checkWord(){
+  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
+  const item=pQueue[pIdx];const ok=ans.toLowerCase()===item.en.toLowerCase();
+  inp.classList.add(ok?'ok':'err');
+  if(ok){pCorrect++;showFB('✓ ¡Correcto!',false);}
+  else{await getAI(`Estoy aprendiendo inglés. La palabra en español era "${item.es||item.en}". Escribí "${ans}" pero la respuesta correcta es "${item.en}". Dame una corrección breve y amigable en español, con algún tip para recordarla. Máximo 3 líneas.`);}
+  document.getElementById('btn-check').style.display='none';document.getElementById('btn-next').style.display='block';
+}
+async function checkSentence(){
+  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
+  const item=pQueue[pIdx];inp.disabled=true;
+  document.getElementById('btn-check').style.display='none';pCorrect++;
+  await getAI(`Estoy aprendiendo inglés. Debía traducir: "${item.es}". Escribí: "${ans}". Corregime de forma amigable en español: decime si está bien, qué mejorar, y cómo quedaría la frase correcta. Máximo 4 líneas.`);
+  document.getElementById('btn-next').style.display='block';
+}
+function checkFill(){
+  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
+  const item=pQueue[pIdx];const ok=ans.toLowerCase()===item.en.toLowerCase();
+  inp.classList.add(ok?'ok':'err');
+  if(ok){pCorrect++;showFB(`✓ ¡Perfecto! La palabra es "${item.en}"`,false);}
+  else{showFB(`✗ Era "${item.en}"${item.es?' — '+item.es:''}`,false);}
+  document.getElementById('btn-check').style.display='none';document.getElementById('btn-next').style.display='block';
+}
+function nextQ(){pIdx++;renderQ();}
+
+function showFB(text,loading){
+  const box=document.getElementById('ai-box');box.classList.add('show');
+  document.getElementById('ai-txt').innerHTML=loading?'<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>':text;
+}
+async function getAI(prompt){
+  showFB('',true);
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    document.getElementById('ai-txt').textContent=d.content?.map(c=>c.text||'').join('')||'Sin respuesta.';
+  }catch{document.getElementById('ai-txt').textContent='No se pudo conectar con la IA.';}
+}
+
+function showResults(){
+  const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
+  let title='¡Muy bien!';if(pct>=90)title='¡Excelente!';else if(pct<40)title='¡Seguí practicando!';
+  document.getElementById('r-title').textContent=title;
+  document.getElementById('r-sub').textContent=`${pct}% de aciertos`;
+  document.getElementById('r-correct').textContent=pCorrect;
+  document.getElementById('r-total').textContent=pQueue.length;
+  showScreen('s-result');
+}
+
+function openSyncModal(){document.getElementById('sheet-url-inp').value=sheetURL||'';document.getElementById('sync-modal').style.display='flex';}
+function closeSyncModal(e){if(e.target===document.getElementById('sync-modal'))document.getElementById('sync-modal').style.display='none';}
+function saveSheetURL(){
+  const url=document.getElementById('sheet-url-inp').value.trim();if(!url){showToast('Pegá la URL del script');return;}
+  sheetURL=url;ls(SHEETK,url);document.getElementById('sheet-status-label').textContent='Conectado ✓';
+  document.getElementById('sync-modal').style.display='none';showToast('✓ URL guardada');
+}
+async function syncNow(){
+  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Ajustes');return;}
+  showToast('Sincronizando...');
+  try{await fetch(sheetURL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'sync',words,sentences})});showToast('✓ Datos enviados al Sheet');}
+  catch{showToast('Error de conexión');}
+}
+function exportData(){
+  const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify({words,sentences},null,2));a.download='lingo-backup.json';a.click();
+}
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.words){words=d.words;lsJ(WK,words);}if(d.sentences){sentences=d.sentences;lsJ(SK,sentences);}updateStats();renderHomeRecent();renderVocab();showToast('✓ Datos importados');}catch{showToast('Error al leer el archivo');}};r.readAsText(file);
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+load();
+</script>
 </body>
 </html>
