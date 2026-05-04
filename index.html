@@ -31,7 +31,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 
 /* HEADER */
 .hdr{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 40px;position:relative;overflow:hidden;}
-/*.hdr::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--bg);border-radius:50%;} */
+.hdr::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:var(--bg);border-radius:50%;}
 .orb{position:absolute;border-radius:50%;pointer-events:none;}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;margin-bottom:6px;}
 .app-name{font-family:'Playfair Display',serif;font-size:27px;color:var(--tx1);letter-spacing:-.5px;}
@@ -220,6 +220,25 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sync-url-inp:focus{border-color:var(--pink);}
 .sync-url-inp::placeholder{color:var(--tx3);}
 
+
+/* LEVEL BADGE */
+.lvl-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.04em;vertical-align:middle;margin-left:6px;}
+.lvl-A1{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3);}
+.lvl-A2{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.3);}
+.lvl-B1{background:rgba(96,165,250,.2);color:#60a5fa;border:1px solid rgba(96,165,250,.3);}
+.lvl-B2{background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.3);}
+.lvl-C1{background:rgba(193,105,214,.25);color:#c169d6;border:1px solid rgba(193,105,214,.35);}
+.lvl-C2{background:rgba(244,114,182,.2);color:#f472b6;border:1px solid rgba(244,114,182,.3);}
+.level-select-row{display:flex;gap:6px;flex-wrap:wrap;}
+.level-pill{padding:5px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:var(--surface);color:var(--tx3);font-family:'Outfit',sans-serif;transition:all .15s;}
+.level-pill.on{border-color:var(--border2);}
+.level-pill.on.lp-A1{background:rgba(74,222,128,.2);color:#4ade80;}
+.level-pill.on.lp-A2{background:rgba(52,211,153,.2);color:#34d399;}
+.level-pill.on.lp-B1{background:rgba(96,165,250,.2);color:#60a5fa;}
+.level-pill.on.lp-B2{background:rgba(129,140,248,.2);color:#818cf8;}
+.level-pill.on.lp-C1{background:rgba(193,105,214,.25);color:#c169d6;}
+.level-pill.on.lp-C2{background:rgba(244,114,182,.2);color:#f472b6;}
+
 /* SENT CARD */
 .sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
 .sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
@@ -285,7 +304,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     </div>
   </div>
   <div class="sec-label" style="margin-top:24px;">Últimas palabras</div>
-  <div id="home-recent" class="wlist" style="padding-bottom:62px;"></div>
+  <div id="home-recent" class="wlist" style="padding-bottom:32px;"></div>
 </div>
 
 <!-- VOCAB -->
@@ -309,8 +328,14 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <span class="chip" onclick="setFilter('v',this)">v</span>
     <span class="chip" onclick="setFilter('adv',this)">adv</span>
     <span class="chip" onclick="setFilter('phrase',this)">frases</span>
+    <span class="chip" onclick="setFilter('A1',this)">A1</span>
+    <span class="chip" onclick="setFilter('A2',this)">A2</span>
+    <span class="chip" onclick="setFilter('B1',this)">B1</span>
+    <span class="chip" onclick="setFilter('B2',this)">B2</span>
+    <span class="chip" onclick="setFilter('C1',this)">C1</span>
+    <span class="chip" onclick="setFilter('C2',this)">C2</span>
   </div>
-  <div id="vocab-list" class="wlist" style="padding-bottom:62px;"></div>
+  <div id="vocab-list" class="wlist" style="padding-bottom:32px;"></div>
 </div>
 
 <!-- ADD -->
@@ -343,6 +368,18 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
         <span class="type-pill" onclick="selType(this,'other')">otro</span>
       </div>
     </div>
+    <div>
+      <div class="f-label">Nivel <span style="color:var(--tx3);font-weight:400;text-transform:none;">(opcional)</span></div>
+      <div class="level-select-row">
+        <span class="level-pill lp-none on" id="lp-none" onclick="selLevel(this,'')">—</span>
+        <span class="level-pill lp-A1" id="lp-A1" onclick="selLevel(this,'A1')">A1</span>
+        <span class="level-pill lp-A2" id="lp-A2" onclick="selLevel(this,'A2')">A2</span>
+        <span class="level-pill lp-B1" id="lp-B1" onclick="selLevel(this,'B1')">B1</span>
+        <span class="level-pill lp-B2" id="lp-B2" onclick="selLevel(this,'B2')">B2</span>
+        <span class="level-pill lp-C1" id="lp-C1" onclick="selLevel(this,'C1')">C1</span>
+        <span class="level-pill lp-C2" id="lp-C2" onclick="selLevel(this,'C2')">C2</span>
+      </div>
+    </div>
     <div><div class="f-label">Ejemplo</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Frase de ejemplo..."></textarea></div>
     <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Guardar</button><div style="height:16px;"></div>
   </div>
@@ -372,7 +409,11 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div class="detail-section"><div class="detail-sec-label">En español</div><div class="detail-sec-text" id="d-es"></div></div>
   <div class="detail-section" id="d-ex-wrap"><div class="detail-sec-label">Ejemplo</div><div class="detail-sec-text" id="d-ex"></div></div>
-  <div class="detail-section"><div class="detail-sec-label">Estado</div><div class="status-row" id="d-status"></div></div>
+  <div style="display:flex;gap:10px;padding:0 16px 10px;">
+    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Nivel</div><div class="detail-sec-text" id="d-level">—</div></div>
+    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Última práctica</div><div class="detail-sec-text" id="d-lastprac">—</div></div>
+  </div>
+  <div class="detail-section" style="margin:0 16px 10px;"><div class="detail-sec-label">Estado</div><div class="status-row" id="d-status"></div></div>
   <button class="btn-danger" onclick="deleteWord()">Eliminar palabra</button><div style="height:32px;"></div>
 </div>
 
@@ -430,7 +471,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     </div>
   </div>
   <div class="sec-label">Copia de seguridad local</div>
-  <div class="settings-section" style="padding-bottom:62px;">
+  <div class="settings-section">
     <div class="settings-card">
       <div class="settings-row" onclick="exportData()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
@@ -596,11 +637,11 @@ async function saveAndSync(){
 }
 
 function sampleWords(){return[
-  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning'},
-  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',example:'Would the Earth survive without the moon?',status:'learning'},
-  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',example:'There is a central heating system that can access the GPS in your mobile phone.',status:'learning'},
-  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning'},
-  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',example:'Mary Kingsley could accompany her father on his travels.',status:'learned'},
+  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',level:'B2',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning',lastPracticed:null},
+  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',level:'B1',example:'Would the Earth survive without the moon?',status:'learning',lastPracticed:null},
+  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',level:'A2',example:'There is a central heating system that can access the GPS in your mobile phone.',status:'learning',lastPracticed:null},
+  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',level:'B1',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning',lastPracticed:null},
+  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null},
 ];}
 function sampleSentences(){return[
   {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning'},
@@ -636,10 +677,13 @@ function updateStats(){
 // ── WORD LIST ─────────────────────────────────────
 function wHTML(w){
   const pct=w.status==='learned'?100:25;
+  const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
+  const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
+  const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · hoy</span>':`<span style="font-size:10px;color:var(--tx3);"> · hace ${daysAgo}d</span>`);
   return `<div class="witem" onclick="showDetail(${w.id})">
     <span class="wtype">${w.type}</span>
     <div class="winfo">
-      <div class="wen">${w.en}</div>
+      <div class="wen">${w.en}${lvlBadge}${practInfo}</div>
       <div class="wes">${w.es||'—'}</div>
       ${w.pron?`<div class="wpron">${w.pron}</div>`:''}
       <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
@@ -652,10 +696,14 @@ function renderHomeRecent(){
   const r=[...words].reverse().slice(0,4);
   el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Agregá tus primeras palabras</div></div>`;
 }
+const LEVELS=['A1','A2','B1','B2','C1','C2'];
 function renderVocab(){
   const el=document.getElementById('vocab-list');
   let list=words.filter(w=>w.status===vocabTab);
-  if(typeFilter!=='all')list=list.filter(w=>w.type===typeFilter);
+  if(typeFilter!=='all'){
+    if(LEVELS.includes(typeFilter)) list=list.filter(w=>w.level===typeFilter);
+    else list=list.filter(w=>w.type===typeFilter);
+  }
   el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No hay palabras aquí todavía</div></div>`;
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
@@ -674,6 +722,13 @@ function showDetail(id){
   document.getElementById('d-status').innerHTML=`
     <button class="status-btn status-learning ${w.status==='learning'?'active-s':''}" onclick="setStatus('learning')">Por aprender</button>
     <button class="status-btn status-learned ${w.status==='learned'?'active-s':''}" onclick="setStatus('learned')">Aprendida ✓</button>`;
+  const lvlEl=document.getElementById('d-level');
+  if(lvlEl){lvlEl.textContent=w.level||'Sin nivel';lvlEl.className='detail-sec-text'+(w.level?` lvl-badge lvl-${w.level}`:' ');}
+  const lpEl=document.getElementById('d-lastprac');
+  if(lpEl){
+    if(w.lastPracticed){const d=Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24));lpEl.textContent=d===0?'Hoy':(d===1?'Ayer':`Hace ${d} días`);}
+    else lpEl.textContent='Nunca';
+  }
   showScreen('s-detail');
 }
 async function setStatus(s){
@@ -686,7 +741,13 @@ async function deleteWord(){
 }
 
 // ── ADD / IMPORT ──────────────────────────────────
+let selWordLevel='';
 function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function selLevel(el,l){
+  selWordLevel=l;
+  document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
 function setAddTab(tab,btn){
   ['add-manual','add-import','add-frases'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('add-'+tab).style.display=tab==='manual'?'flex':'block';
@@ -694,7 +755,7 @@ function setAddTab(tab,btn){
 }
 async function addManual(){
   const en=document.getElementById('f-en').value.trim();if(!en){showToast('Escribí la palabra en inglés');return;}
-  words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,example:document.getElementById('f-ex').value.trim(),status:'learning'});
+  words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,level:selWordLevel,example:document.getElementById('f-ex').value.trim(),status:'learning',lastPracticed:null});
   await saveAndSync();updateStats();
   ['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');
   showToast('✓ Palabra guardada');
@@ -721,29 +782,65 @@ async function importSentences(){
 }
 
 // ── PRACTICE ──────────────────────────────────────
+// Smart word selection: mix of never practiced, long-ago, hard (C1/C2), easy (A1/A2), and learned words
+function buildSmartQueue(pool, total){
+  const now = Date.now();
+  const dayMs = 1000*60*60*24;
+  
+  // Score each word — higher score = higher priority to appear
+  const scored = pool.map(w => {
+    let score = 0;
+    // Days since last practice (never = 999)
+    const daysSince = w.lastPracticed ? Math.floor((now - new Date(w.lastPracticed)) / dayMs) : 999;
+    score += Math.min(daysSince, 30) * 2; // max 60 pts for staleness
+    // Never practiced bonus
+    if (!w.lastPracticed) score += 20;
+    // Level difficulty: C1/C2 appear more
+    if (w.level==='C1'||w.level==='C2') score += 15;
+    if (w.level==='A1'||w.level==='A2') score += 8; // easy words still need review
+    // Learned words get lower base score so new words dominate slightly
+    if (w.status==='learned') score -= 5;
+    // Add randomness so it's never identical
+    score += Math.random() * 15;
+    return { w, score };
+  });
+
+  scored.sort((a,b) => b.score - a.score);
+  return scored.slice(0, total).map(s => s.w).sort(() => Math.random() - .5);
+}
+
 function startMode(mode){
   pMode=mode;pIdx=0;pCorrect=0;
   const names={'es-en':'ESP → ING','recall':'¿Lo sabés?','sentences':'Traducir frases','fill':'Completar frase'};
   document.getElementById('p-title').textContent=names[mode]||mode;
   if(mode==='sentences'){
-    pQueue=sentences.filter(s=>s.status==='learning').sort(()=>Math.random()-.5).slice(0,8);
+    pQueue=sentences.sort(()=>Math.random()-.5).slice(0,8);
     if(!pQueue.length){showToast('No hay frases. Importá algunas primero.');return;}
   }else if(mode==='fill'){
-    pQueue=words.filter(w=>w.example&&w.status==='learning').sort(()=>Math.random()-.5).slice(0,8);
+    const pool=words.filter(w=>w.example);
+    pQueue=buildSmartQueue(pool, 8);
     if(!pQueue.length){showToast('Necesitás palabras con ejemplos para este modo.');return;}
   }else{
-    pQueue=words.filter(w=>w.status==='learning').sort(()=>Math.random()-.5).slice(0,10);
-    if(!pQueue.length)pQueue=[...words].sort(()=>Math.random()-.5).slice(0,10);
-    if(!pQueue.length){showToast('Agregá palabras para practicar.');return;}
+    if(!words.length){showToast('Agregá palabras para practicar.');return;}
+    pQueue=buildSmartQueue(words, 10);
   }
   markPracticeToday();
   lastScreen='s-home';showScreen('s-practice');renderQ();
 }
 function startSameMode(){if(pMode)startMode(pMode);}
 
+function markWordPracticed(item){
+  // Update lastPracticed for word items (not sentences)
+  if(item.en){
+    const w=words.find(x=>x.id===item.id);
+    if(w){w.lastPracticed=new Date().toISOString();saveLocal();}
+  }
+}
+
 function renderQ(){
   if(pIdx>=pQueue.length){showResults();return;}
   const item=pQueue[pIdx];
+  markWordPracticed(item);
   document.getElementById('p-prog').style.width=Math.round((pIdx/pQueue.length)*100)+'%';
   document.getElementById('p-count').textContent=`${pIdx+1}/${pQueue.length}`;
   let html='';
