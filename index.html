@@ -23,7 +23,7 @@
 }
 html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx1);overscroll-behavior:none;}
 body{max-width:430px;margin:0 auto;min-height:100vh;
-  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 32px);}
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 48px);}
 
 .screen{display:none;}
 .screen.active{display:block;animation:rise .22s ease;}
@@ -264,60 +264,60 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="orb" style="width:60px;height:60px;bottom:20px;left:16px;background:rgba(143,83,191,.15);"></div>
     <div class="hdr-top">
       <span class="app-name">Lin<em>go</em></span>
-      <span id="streak-pill" class="hdr-pill">🔥 0 días</span>
+      <span id="streak-pill" class="hdr-pill">🔥 0 days</span>
     </div>
-    <div class="hdr-sub">Hola! ¿Practicamos hoy?</div>
+    <div class="hdr-sub">Hello! Shall we practice today?</div>
   </div>
   <div class="sync-status" id="sync-bar">
     <span class="sync-dot" id="sync-dot"></span>
-    <span id="sync-label">Sin conectar</span>
-    <button class="sync-btn-small" onclick="syncFromSheet()">↻ Actualizar</button>
+    <span id="sync-label">Not connected</span>
+    <button class="sync-btn-small" onclick="syncFromSheet()">↻ Refresh</button>
   </div>
   <div class="stats">
-    <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Palabras</div></div>
-    <div class="stat"><div class="stat-n" id="st-learned">0</div><div class="stat-l">Aprendidas</div></div>
-    <div class="stat"><div class="stat-n" id="st-sentences">0</div><div class="stat-l">Frases</div></div>
+    <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Words</div></div>
+    <div class="stat"><div class="stat-n" id="st-learned">0</div><div class="stat-l">Learned</div></div>
+    <div class="stat"><div class="stat-n" id="st-sentences">0</div><div class="stat-l">Sentences</div></div>
   </div>
-  <div class="sec-label">Practicar</div>
+  <div class="sec-label">Practice</div>
   <div class="prac-grid">
     <div class="prac-card" onclick="startMode('es-en')">
       <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M5 8l6 6M4 6h7M2 4h9M15 5h5l-5 14M19 9h-3"/></svg></div>
       <div class="prac-title">ESP → ING</div>
-      <div class="prac-desc">Ves en español, escribís en inglés</div>
+      <div class="prac-desc">See in Spanish, write in English</div>
     </div>
     <div class="prac-card" onclick="startMode('recall')">
       <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg></div>
       <div class="prac-title">¿Lo sabés?</div>
-      <div class="prac-desc">Tarjeta que se da vuelta</div>
+      <div class="prac-desc">Flip card</div>
     </div>
     <div class="prac-card" onclick="startMode('sentences')">
       <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-      <div class="prac-title">Traducir frase</div>
-      <div class="prac-desc">Del español al inglés</div>
+      <div class="prac-title">Translate sentence</div>
+      <div class="prac-desc">From Spanish to English</div>
     </div>
     <div class="prac-card" onclick="startMode('fill')">
       <div class="prac-glyph"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h2M13 15h4"/></svg></div>
-      <div class="prac-title">Completar</div>
-      <div class="prac-desc">Completá el espacio en blanco</div>
+      <div class="prac-title">Fill in</div>
+      <div class="prac-desc">Fill in the blank</div>
     </div>
   </div>
-  <div class="sec-label" style="margin-top:24px;">Últimas palabras</div>
-  <div id="home-recent" class="wlist" style="padding-bottom:62px;"></div>
+  <div class="sec-label" style="margin-top:24px;">Recent words</div>
+  <div id="home-recent" class="wlist" style="padding-bottom:96px;"></div>
 </div>
 
 <!-- VOCAB -->
 <div id="s-vocab" class="screen">
   <div class="hdr">
     <div class="hdr-top">
-      <span class="app-name">Vocabulario</span>
-      <button class="hdr-pill" onclick="showScreen('s-add')">+ Agregar</button>
+      <span class="app-name">Vocabulary</span>
+      <button class="hdr-pill" onclick="showScreen('s-add')">+ Add</button>
     </div>
-    <div class="hdr-sub">Tus palabras y frases</div>
+    <div class="hdr-sub">Your words and sentences</div>
   </div>
   <div style="height:32px;"></div>
   <div class="tabs">
-    <button class="tab on" onclick="setVocabTab('learning',this)">Por aprender</button>
-    <button class="tab" onclick="setVocabTab('learned',this)">Aprendidas</button>
+    <button class="tab on" onclick="setVocabTab('learning',this)">To learn</button>
+    <button class="tab" onclick="setVocabTab('learned',this)">Learned</button>
   </div>
   <div class="chips">
     <span class="chip on" onclick="setFilter('all',this)">Todas</span>
@@ -325,7 +325,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <span class="chip" onclick="setFilter('n',this)">n</span>
     <span class="chip" onclick="setFilter('v',this)">v</span>
     <span class="chip" onclick="setFilter('adv',this)">adv</span>
-    <span class="chip" onclick="setFilter('phrase',this)">frases</span>
+    <span class="chip" onclick="setFilter('phrase',this)">sentences</span>
     <span class="chip" onclick="setFilter('A1',this)">A1</span>
     <span class="chip" onclick="setFilter('A2',this)">A2</span>
     <span class="chip" onclick="setFilter('B1',this)">B1</span>
@@ -333,7 +333,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <span class="chip" onclick="setFilter('C1',this)">C1</span>
     <span class="chip" onclick="setFilter('C2',this)">C2</span>
   </div>
-  <div id="vocab-list" class="wlist" style="padding-bottom:62px;"></div>
+  <div id="vocab-list" class="wlist" style="padding-bottom:96px;"></div>
 </div>
 
 <!-- ADD -->
@@ -341,22 +341,22 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div class="hdr">
     <div class="hdr-top">
       <button class="hdr-pill" onclick="goBack()">← Volver</button>
-      <span class="app-name" style="font-size:20px;">Agregar</span>
+      <span class="app-name" style="font-size:20px;">Add</span>
     </div>
-    <div class="hdr-sub">Nuevas palabras o importar</div>
+    <div class="hdr-sub">New words or import</div>
   </div>
   <div style="height:28px;"></div>
   <div class="tabs" id="add-tabs">
-    <button class="tab on" onclick="setAddTab('manual',this)">A mano</button>
-    <button class="tab" onclick="setAddTab('import',this)">Importar</button>
-    <button class="tab" onclick="setAddTab('frases',this)">Frases</button>
+    <button class="tab on" onclick="setAddTab('manual',this)">Manual</button>
+    <button class="tab" onclick="setAddTab('import',this)">Import</button>
+    <button class="tab" onclick="setAddTab('sentences',this)">Sentences</button>
   </div>
   <div id="add-manual" class="form-wrap">
-    <div><div class="f-label">Palabra en inglés *</div><input class="f-inp" id="f-en" placeholder="ej: abandoned"/></div>
-    <div><div class="f-label">Traducción</div><input class="f-inp" id="f-es" placeholder="ej: abandonado/a"/></div>
-    <div><div class="f-label">Pronunciación</div><input class="f-inp" id="f-pron" placeholder="ej: /əˈbændənd/"/></div>
+    <div><div class="f-label">English word *</div><input class="f-inp" id="f-en" placeholder="e.g.: abandoned"/></div>
+    <div><div class="f-label">Translation</div><input class="f-inp" id="f-es" placeholder="e.g.: abandoned"/></div>
+    <div><div class="f-label">Pronunciation</div><input class="f-inp" id="f-pron" placeholder="e.g.: /əˈbændənd/"/></div>
     <div>
-      <div class="f-label">Tipo</div>
+      <div class="f-label">Type</div>
       <div class="pill-row">
         <span class="type-pill on" onclick="selType(this,'adj')">adj</span>
         <span class="type-pill" onclick="selType(this,'n')">n</span>
@@ -367,7 +367,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
       </div>
     </div>
     <div>
-      <div class="f-label">Nivel <span style="color:var(--tx3);font-weight:400;text-transform:none;">(opcional)</span></div>
+      <div class="f-label">Level <span style="color:var(--tx3);font-weight:400;text-transform:none;">(optional)</span></div>
       <div class="level-select-row">
         <span class="level-pill lp-none on" id="lp-none" onclick="selLevel(this,'')">—</span>
         <span class="level-pill lp-A1" id="lp-A1" onclick="selLevel(this,'A1')">A1</span>
@@ -378,19 +378,19 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
         <span class="level-pill lp-C2" id="lp-C2" onclick="selLevel(this,'C2')">C2</span>
       </div>
     </div>
-    <div><div class="f-label">Ejemplo</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Frase de ejemplo..."></textarea></div>
-    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Guardar</button><div style="height:16px;"></div>
+    <div><div class="f-label">Example</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Example sentence..."></textarea></div>
+    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Save</button><div style="height:16px;"></div>
   </div>
   <div id="add-import" style="display:none;padding:0 16px;">
-    <div class="import-hint">Pegá el texto del PDF línea por línea:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
+    <div class="import-hint">Paste your PDF text line by line:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
     <textarea class="f-inp f-ta" id="imp-text" style="height:160px;" placeholder="abandoned adj /əˈbændənd/ You can usually...&#10;absence n /ˈæbsəns/ Would the Earth..."></textarea>
-    <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Importar palabras</button>
+    <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Import palabras</button>
     <div class="import-result" id="imp-result"></div><div style="height:62px;"></div>
   </div>
-  <div id="add-frases" style="display:none;padding:0 16px;">
-    <div class="import-hint">Pegá las frases en español, una por línea o numeradas:</div>
-    <textarea class="f-inp f-ta" id="fras-text" style="height:160px;" placeholder="1. Ella trabaja en una empresa grande...&#10;2. Normalmente no toma decisiones..."></textarea>
-    <button class="btn-main" style="margin-top:10px;" onclick="importSentences()">Importar frases</button>
+  <div id="add-sentences" style="display:none;padding:0 16px;">
+    <div class="import-hint">Pegá las sentences en español, una por línea o numeradas:</div>
+    <textarea class="f-inp f-ta" id="fras-text" style="height:160px;" placeholder="1. She works at a large company...&#10;2. She usually does not make important decisions..."></textarea>
+    <button class="btn-main" style="margin-top:10px;" onclick="importSentences()">Import sentences</button>
     <div class="import-result" id="fras-result"></div><div style="height:62px;"></div>
   </div>
 </div>
@@ -405,21 +405,21 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="detail-pron" id="d-pron"></div>
     <span class="detail-type" id="d-type"></span>
   </div>
-  <div class="detail-section"><div class="detail-sec-label">En español</div><div class="detail-sec-text" id="d-es"></div></div>
-  <div class="detail-section" id="d-ex-wrap"><div class="detail-sec-label">Ejemplo</div><div class="detail-sec-text" id="d-ex"></div></div>
+  <div class="detail-section"><div class="detail-sec-label">In Spanish</div><div class="detail-sec-text" id="d-es"></div></div>
+  <div class="detail-section" id="d-ex-wrap"><div class="detail-sec-label">Example</div><div class="detail-sec-text" id="d-ex"></div></div>
   <div style="display:flex;gap:10px;padding:0 16px 10px;">
-    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Nivel</div><div id="d-level" class="detail-sec-text">—</div></div>
-    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Última práctica</div><div class="detail-sec-text" id="d-lastprac">—</div></div>
+    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Level</div><div id="d-level" class="detail-sec-text">—</div></div>
+    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Last practiced</div><div class="detail-sec-text" id="d-lastprac">—</div></div>
   </div>
-  <div class="detail-section" style="margin:0 16px 10px;"><div class="detail-sec-label">Estado</div><div class="status-row" id="d-status"></div></div>
-  <button class="btn-danger" onclick="deleteWord()">Eliminar palabra</button><div style="height:62px;"></div>
+  <div class="detail-section" style="margin:0 16px 10px;"><div class="detail-sec-label">Status</div><div class="status-row" id="d-status"></div></div>
+  <button class="btn-danger" onclick="deleteWord()">Delete word</button><div style="height:62px;"></div>
 </div>
 
 <!-- PRACTICE -->
 <div id="s-practice" class="screen">
   <div class="prac-hdr">
     <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <span class="prac-hdr-title" id="p-title">Practicar</span>
+    <span class="prac-hdr-title" id="p-title">Practice</span>
     <span class="prac-count" id="p-count">1/10</span>
   </div>
   <div class="prog-strip"><div class="prog-strip-fill" id="p-prog" style="width:0%"></div></div>
@@ -430,22 +430,22 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <div id="s-result" class="screen">
   <div class="result-wrap">
     <div class="result-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-    <div class="result-title" id="r-title">¡Muy bien!</div>
+    <div class="result-title" id="r-title">Well done!</div>
     <div class="result-sub" id="r-sub">Completaste la sesión</div>
     <div class="result-nums">
-      <div><div class="result-num" id="r-correct">—</div><div class="result-numlabel">Correctas</div></div>
+      <div><div class="result-num" id="r-correct">—</div><div class="result-numlabel">Correct</div></div>
       <div><div class="result-num" id="r-total">—</div><div class="result-numlabel">Total</div></div>
     </div>
-    <button class="btn-main" onclick="showScreen('s-home')">Volver al inicio</button>
-    <button class="btn-out" style="display:block;" onclick="startSameMode()">Practicar de nuevo</button>
+    <button class="btn-main" onclick="showScreen('s-home')">Back to home</button>
+    <button class="btn-out" style="display:block;" onclick="startSameMode()">Practice de nuevo</button>
   </div>
 </div>
 
 <!-- SETTINGS -->
 <div id="s-settings" class="screen">
   <div class="hdr">
-    <div class="hdr-top"><span class="app-name">Ajustes</span></div>
-    <div class="hdr-sub">Configuración y sincronización</div>
+    <div class="hdr-top"><span class="app-name">Settings</span></div>
+    <div class="hdr-sub">Configuration and sync</div>
   </div>
   <div style="height:32px;"></div>
   <div class="sec-label">Google Sheets</div>
@@ -453,32 +453,32 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="settings-card">
       <div class="settings-row" onclick="openSyncModal()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
-        <div class="settings-row-text"><div class="settings-row-title">Conectar Google Sheets</div><div class="settings-row-sub" id="sheet-status-label">No conectado</div></div>
+        <div class="settings-row-text"><div class="settings-row-title">Connect Google Sheets</div><div class="settings-row-sub" id="sheet-status-label">Not connected</div></div>
         <span class="settings-row-arrow">›</span>
       </div>
       <div class="settings-row" onclick="syncFromSheet()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
-        <div class="settings-row-text"><div class="settings-row-title">Cargar desde Sheet</div><div class="settings-row-sub">Reemplaza los datos locales con los del Sheet</div></div>
+        <div class="settings-row-text"><div class="settings-row-title">Load from Sheet</div><div class="settings-row-sub">Replaces local data with Sheet data</div></div>
         <span class="settings-row-arrow">›</span>
       </div>
       <div class="settings-row" onclick="syncToSheet()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-        <div class="settings-row-text"><div class="settings-row-title">Guardar en Sheet</div><div class="settings-row-sub">Sube todos tus datos al Sheet ahora</div></div>
+        <div class="settings-row-text"><div class="settings-row-title">Save en Sheet</div><div class="settings-row-sub">Upload all your data to Sheet now</div></div>
         <span class="settings-row-arrow">›</span>
       </div>
     </div>
   </div>
-  <div class="sec-label">Copia de seguridad local</div>
-  <div class="settings-section" style="padding-bottom:62px;">
+  <div class="sec-label">Local backup</div>
+  <div class="settings-section" style="padding-bottom:96px;">
     <div class="settings-card">
       <div class="settings-row" onclick="exportData()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-        <div class="settings-row-text"><div class="settings-row-title">Exportar como JSON</div><div class="settings-row-sub">Descargá una copia de seguridad</div></div>
+        <div class="settings-row-text"><div class="settings-row-title">Export as JSON</div><div class="settings-row-sub">Download a backup copy</div></div>
         <span class="settings-row-arrow">›</span>
       </div>
       <div class="settings-row" onclick="document.getElementById('json-inp').click()">
         <div class="settings-row-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-        <div class="settings-row-text"><div class="settings-row-title">Importar JSON</div><div class="settings-row-sub">Restaurar desde copia de seguridad</div></div>
+        <div class="settings-row-text"><div class="settings-row-title">Import JSON</div><div class="settings-row-sub">Restore from backup</div></div>
         <span class="settings-row-arrow">›</span>
       </div>
     </div>
@@ -489,14 +489,14 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- SYNC MODAL -->
 <div id="sync-modal" class="sync-modal" style="display:none;" onclick="closeSyncModal(event)">
   <div class="sync-modal-box">
-    <div class="sync-modal-title">Conectar Google Sheets</div>
-    <div class="sync-modal-sub">Solo lo configurás una vez. Todos tus datos se guardan en tu propio Sheet.</div>
-    <div class="sync-step"><div class="sync-step-num">1</div><div class="sync-step-text">Creá un Google Sheet nuevo</div></div>
-    <div class="sync-step"><div class="sync-step-num">2</div><div class="sync-step-text">Extensiones → Apps Script → borrá todo → pegá <strong>script.gs</strong> → Guardar</div></div>
-    <div class="sync-step"><div class="sync-step-num">3</div><div class="sync-step-text">Implementar → Nueva implementación → Aplicación web → Ejecutar como: <strong>Yo</strong> → Acceso: <strong>Cualquier persona</strong> → Copiar URL</div></div>
-    <div class="sync-step"><div class="sync-step-num">4</div><div class="sync-step-text">Pegá la URL acá:</div></div>
+    <div class="sync-modal-title">Connect Google Sheets</div>
+    <div class="sync-modal-sub">Set it up once. All your data is saved in your own Sheet.</div>
+    <div class="sync-step"><div class="sync-step-num">1</div><div class="sync-step-text">Create a new Google Sheet</div></div>
+    <div class="sync-step"><div class="sync-step-num">2</div><div class="sync-step-text">Extensiones → Apps Script → borrá todo → pegá <strong>script.gs</strong> → Save</div></div>
+    <div class="sync-step"><div class="sync-step-num">3</div><div class="sync-step-text">Deploy → New deployment → Web app → Execute as: <strong>Me</strong> → Access: <strong>Anyone</strong> → Copy URL</div></div>
+    <div class="sync-step"><div class="sync-step-num">4</div><div class="sync-step-text">Paste the URL here:</div></div>
     <input class="sync-url-inp" id="sheet-url-inp" placeholder="https://script.google.com/macros/s/..."/>
-    <button class="btn-main" onclick="saveSheetURL()">Guardar y conectar</button>
+    <button class="btn-main" onclick="saveSheetURL()">Save y conectar</button>
   </div>
 </div>
 
@@ -504,19 +504,19 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <nav class="nav" id="main-nav">
   <button class="nav-btn on" id="nav-home" onclick="showScreen('s-home')">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span class="nav-lbl">Inicio</span><span class="nav-dot"></span>
+    <span class="nav-lbl">Home</span><span class="nav-dot"></span>
   </button>
   <button class="nav-btn" id="nav-vocab" onclick="showScreen('s-vocab')">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    <span class="nav-lbl">Vocabulario</span><span class="nav-dot"></span>
+    <span class="nav-lbl">Vocabulary</span><span class="nav-dot"></span>
   </button>
   <button class="nav-btn" id="nav-add" onclick="showScreen('s-add')">
     <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    <span class="nav-lbl">Agregar</span><span class="nav-dot"></span>
+    <span class="nav-lbl">Add</span><span class="nav-dot"></span>
   </button>
   <button class="nav-btn" id="nav-settings" onclick="showScreen('s-settings')">
     <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span class="nav-lbl">Ajustes</span><span class="nav-dot"></span>
+    <span class="nav-lbl">Settings</span><span class="nav-dot"></span>
   </button>
 </nav>
 
@@ -535,7 +535,7 @@ function loadStreak(){
   updateStreakPill(d.count);
 }
 function updateStreakPill(n){
-  document.getElementById('streak-pill').textContent=`🔥 ${n} día${n!==1?'s':''}`;
+  document.getElementById('streak-pill').textContent=`🔥 ${n} day${n!==1?'s':''}`;
 }
 function markPracticeToday(){
   const d=lsJ(STREAKK)||{count:0,lastDate:''};
@@ -589,35 +589,35 @@ async function load(){
   } else {
     if(!words.length) words=sampleWords();
     if(!sentences.length) sentences=sampleSentences();
-    setSyncStatus('','Sin conectar — ve a Ajustes');
+    setSyncStatus('','Not connected — ve a Settings');
   }
   updateStats();renderHomeRecent();renderVocab();
 }
 
 async function syncFromSheet(silent){
-  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Ajustes');return;}
-  setSyncStatus('syncing','Cargando desde Sheet...');
+  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Settings');return;}
+  setSyncStatus('syncing','Loading from Sheet...');
   const data=await sheetGet();
   if(data&&data.ok){
     if(data.words&&data.words.length){words=data.words;lsJ(WK,words);}
     if(data.sentences&&data.sentences.length){sentences=data.sentences;lsJ(SK,sentences);}
     if(data.streak){lsJ(STREAKK,data.streak);updateStreakPill(data.streak.count||0);}
-    setSyncStatus('ok','Sincronizado con Sheet ✓');
+    setSyncStatus('ok','Synced with Sheet ✓');
     updateStats();renderHomeRecent();renderVocab();
-    if(!silent) showToast('✓ Datos cargados desde Sheet');
+    if(!silent) showToast('✓ Data loaded from Sheet');
   } else {
     setSyncStatus('err','Error al conectar');
-    if(!silent) showToast('No se pudo conectar con el Sheet');
+    if(!silent) showToast('Could not connect to Sheet');
   }
 }
 
 async function syncToSheet(){
-  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Ajustes');return;}
-  setSyncStatus('syncing','Guardando en Sheet...');
+  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Settings');return;}
+  setSyncStatus('syncing','Saving to Sheet...');
   const streak=lsJ(STREAKK)||{count:0,lastDate:''};
   const res=await sheetPost({action:'saveAll',words,sentences,streak});
-  if(res&&res.ok){setSyncStatus('ok','Guardado en Sheet ✓');showToast('✓ Todo guardado en Google Sheet');}
-  else{setSyncStatus('err','Error al guardar');showToast('Error al guardar en el Sheet');}
+  if(res&&res.ok){setSyncStatus('ok','Guardado en Sheet ✓');showToast('✓ All data saved to Google Sheet');}
+  else{setSyncStatus('err','Error saving');showToast('Error saving to Sheet');}
 }
 
 function saveLocal(){lsJ(WK,words);lsJ(SK,sentences);}
@@ -641,6 +641,7 @@ function sampleSentences(){return[
 // ── SCREENS ───────────────────────────────────────
 function showScreen(id){
   const isPrac=id==='s-practice'||id==='s-result';
+  const isOverlay=id==='s-add'||id==='s-detail';
   document.getElementById('main-nav').style.display=isPrac?'none':'flex';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -648,7 +649,8 @@ function showScreen(id){
     ['nav-home','nav-vocab','nav-add','nav-settings'].forEach(n=>document.getElementById(n).classList.remove('on'));
     const m={'s-home':'nav-home','s-vocab':'nav-vocab','s-add':'nav-add','s-settings':'nav-settings'};
     if(m[id])document.getElementById(m[id]).classList.add('on');
-    lastScreen=id;
+    // only update lastScreen for main tabs, not overlays
+    if(!isOverlay) lastScreen=id;
   }
   if(id==='s-vocab')renderVocab();
   if(id==='s-home'){updateStats();renderHomeRecent();}
@@ -666,7 +668,7 @@ function wHTML(w){
   const pct=w.status==='learned'?100:25;
   const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
   const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
-  const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · hoy</span>':`<span style="font-size:10px;color:var(--tx3);"> · hace ${daysAgo}d</span>`);
+  const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
   return `<div class="witem" onclick="showDetail(${w.id})">
     <span class="wtype">${w.type}</span>
     <div class="winfo">
@@ -681,7 +683,7 @@ function wHTML(w){
 function renderHomeRecent(){
   const el=document.getElementById('home-recent');
   const r=[...words].reverse().slice(0,4);
-  el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Agregá tus primeras palabras</div></div>`;
+  el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Add your first words</div></div>`;
 }
 const LEVELS=['A1','A2','B1','B2','C1','C2'];
 function renderVocab(){
@@ -691,7 +693,7 @@ function renderVocab(){
     if(LEVELS.includes(typeFilter)) list=list.filter(w=>w.level===typeFilter);
     else list=list.filter(w=>w.type===typeFilter);
   }
-  el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No hay palabras aquí todavía</div></div>`;
+  el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
 function setFilter(f,el){typeFilter=f;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
@@ -712,32 +714,32 @@ function showDetail(id){
   else{lvlEl.textContent='—';lvlEl.className='detail-sec-text';}
   // last practiced
   const lpEl=document.getElementById('d-lastprac');
-  if(w.lastPracticed){const d=Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24));lpEl.textContent=d===0?'Hoy':(d===1?'Ayer':`Hace ${d} días`);}
-  else lpEl.textContent='Nunca';
+  if(w.lastPracticed){const d=Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24));lpEl.textContent=d===0?'Today':(d===1?'Yesterday':`Last ${d} days`);}
+  else lpEl.textContent='Never';
   document.getElementById('d-status').innerHTML=`
-    <button class="status-btn status-learning ${w.status==='learning'?'active-s':''}" onclick="setStatus('learning')">Por aprender</button>
-    <button class="status-btn status-learned ${w.status==='learned'?'active-s':''}" onclick="setStatus('learned')">Aprendida ✓</button>`;
+    <button class="status-btn status-learning ${w.status==='learning'?'active-s':''}" onclick="setStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${w.status==='learned'?'active-s':''}" onclick="setStatus('learned')">Learned ✓</button>`;
   showScreen('s-detail');
 }
 async function setStatus(s){
   const w=words.find(x=>x.id===curDetailId);if(!w)return;
   w.status=s;await saveAndSync();showDetail(curDetailId);
-  showToast(s==='learned'?'✓ Marcada como aprendida':'Movida a por aprender');
+  showToast(s==='learned'?'✓ Marked as learned':'Moved to to learn');
 }
 async function deleteWord(){
-  words=words.filter(w=>w.id!==curDetailId);await saveAndSync();goBack();showToast('Palabra eliminada');
+  words=words.filter(w=>w.id!==curDetailId);await saveAndSync();goBack();showToast('Word deleted');
 }
 
 // ── ADD / IMPORT ──────────────────────────────────
 function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function selLevel(el,l){selWordLevel=l;document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function setAddTab(tab,btn){
-  ['add-manual','add-import','add-frases'].forEach(id=>document.getElementById(id).style.display='none');
+  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('add-'+tab).style.display=tab==='manual'?'flex':'block';
   document.querySelectorAll('#add-tabs .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
 }
 async function addManual(){
-  const en=document.getElementById('f-en').value.trim();if(!en){showToast('Escribí la palabra en inglés');return;}
+  const en=document.getElementById('f-en').value.trim();if(!en){showToast('Enter the English word');return;}
   words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,level:selWordLevel,example:document.getElementById('f-ex').value.trim(),status:'learning',lastPracticed:null});
   await saveAndSync();updateStats();
   ['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');
@@ -745,7 +747,7 @@ async function addManual(){
   document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));
   document.getElementById('lp-none').classList.add('on');
   selWordLevel='';
-  showToast('✓ Palabra guardada');
+  showToast('✓ Word saved');
 }
 async function importWords(){
   const text=document.getElementById('imp-text').value.trim();if(!text)return;
@@ -756,16 +758,16 @@ async function importWords(){
     else if(line.length>2){const p=line.split(/\s+/);words.push({id:Date.now()+count,en:p[0],type:'n',pron:'',example:p.slice(1).join(' '),es:'',level:'',status:'learning',lastPracticed:null});count++;}
   });
   await saveAndSync();updateStats();
-  document.getElementById('imp-result').textContent=`✓ ${count} palabras importadas`;
-  document.getElementById('imp-text').value='';showToast(`✓ ${count} palabras importadas`);
+  document.getElementById('imp-result').textContent=`✓ ${count} words imported`;
+  document.getElementById('imp-text').value='';showToast(`✓ ${count} words imported`);
 }
 async function importSentences(){
   const text=document.getElementById('fras-text').value.trim();if(!text)return;
   let count=0;
   text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning'});count++;});
   await saveAndSync();updateStats();
-  document.getElementById('fras-result').textContent=`✓ ${count} frases importadas`;
-  document.getElementById('fras-text').value='';showToast(`✓ ${count} frases importadas`);
+  document.getElementById('fras-result').textContent=`✓ ${count} sentences importadas`;
+  document.getElementById('fras-text').value='';showToast(`✓ ${count} sentences importadas`);
 }
 
 // ── SMART PRACTICE SELECTION ──────────────────────
@@ -787,17 +789,17 @@ function buildSmartQueue(pool,total){
 
 function startMode(mode){
   pMode=mode;pIdx=0;pCorrect=0;
-  const names={'es-en':'ESP → ING','recall':'¿Lo sabés?','sentences':'Traducir frases','fill':'Completar frase'};
+  const names={'es-en':'ESP → ING','recall':'¿Lo sabés?','sentences':'Translate sentences','fill':'Fill in frase'};
   document.getElementById('p-title').textContent=names[mode]||mode;
   if(mode==='sentences'){
     pQueue=sentences.sort(()=>Math.random()-.5).slice(0,8);
-    if(!pQueue.length){showToast('No hay frases. Importá algunas primero.');return;}
+    if(!pQueue.length){showToast('No hay sentences. Importá algunas primero.');return;}
   }else if(mode==='fill'){
     const pool=words.filter(w=>w.example);
     pQueue=buildSmartQueue(pool,8);
-    if(!pQueue.length){showToast('Necesitás palabras con ejemplos para este modo.');return;}
+    if(!pQueue.length){showToast('You need words with examples for this mode.');return;}
   }else{
-    if(!words.length){showToast('Agregá palabras para practicar.');return;}
+    if(!words.length){showToast('Add words to practice.');return;}
     pQueue=buildSmartQueue(words,10);
   }
   markPracticeToday();
@@ -821,20 +823,21 @@ function renderQ(){
   const lvlTag=item.level?`<span class="lvl-badge lvl-${item.level}" style="font-size:11px;">${item.level}</span> `:'';
   let html='';
   if(pMode==='es-en'){
-    html=`<div class="q-label">¿Cómo se dice en inglés?</div>
+    html=`<div class="q-label">How do you say it in English?</div>
     <div class="q-card"><div class="q-word">${item.es||item.en}</div><div class="q-sub">${lvlTag}${item.type||''}</div></div>
-    <input class="ans-inp" id="a-inp" placeholder="Escribí en inglés..." onkeydown="if(event.key==='Enter')checkWord()"/>
-    <div class="ai-box" id="ai-box"><div class="ai-label">Corrección</div><div class="ai-text" id="ai-txt"></div></div>
-    <button class="btn-main" id="btn-check" onclick="checkWord()">Verificar</button>
-    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+    <input class="ans-inp" id="a-inp" placeholder="Type in English..." onkeydown="if(event.key==='Enter')checkWord()"/>
+    <div class="ai-box" id="ai-box"><div class="ai-label">Correction</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkWord()">Check</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
   }else if(pMode==='recall'){
-    html=`<div class="q-label">¿Sabés qué significa?</div>
+    html=`<div class="q-label">Do you know what it means?</div>
     <div class="flip-wrap" onclick="doFlip()">
       <div class="flip-card" id="flip-card">
         <div class="flip-face flip-front">
           <div class="q-word">${item.en}</div>
-          <div class="q-sub">${lvlTag}${item.type||''} ${item.pron||''}</div>
-          <div class="flip-hint">Tocá para ver el significado</div>
+          <div class="q-sub">${lvlTag}${item.type||''}</div>
+          ${item.pron?`<div style="font-size:13px;color:var(--soft);margin-top:6px;font-style:italic;">${item.pron}</div>`:''}
+          <div class="flip-hint">Tap to see the meaning</div>
         </div>
         <div class="flip-face flip-back">
           <div class="q-word" style="font-size:22px;">${item.es||'—'}</div>
@@ -843,31 +846,52 @@ function renderQ(){
       </div>
     </div>
     <div class="eval-row" id="eval-row" style="display:none;">
-      <button class="eval-btn eval-forgot" onclick="selfEval(false)">No lo sabía</button>
-      <button class="eval-btn eval-knew" onclick="selfEval(true)">Lo sabía ✓</button>
+      <button class="eval-btn eval-forgot" onclick="selfEval(false)">Didn't know it</button>
+      <button class="eval-btn eval-knew" onclick="selfEval(true)">Knew it ✓</button>
     </div>`;
   }else if(pMode==='sentences'){
-    html=`<div class="q-label">Traducí al inglés:</div>
-    <div class="sent-card"><div class="sent-es">${item.es}</div><div class="sent-hint">Escribí lo mejor que puedas</div></div>
+    html=`<div class="q-label">Translate to English:</div>
+    <div class="sent-card"><div class="sent-es">${item.es}</div><div class="sent-hint">Write the best you can</div></div>
     <textarea class="ans-inp ans-ta" id="a-inp" placeholder="Your translation here..."></textarea>
-    <div class="ai-box" id="ai-box"><div class="ai-label">Corrección IA</div><div class="ai-text" id="ai-txt"></div></div>
-    <button class="btn-main" id="btn-check" onclick="checkSentence()">Enviar para corrección</button>
-    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+    <div class="ai-box" id="ai-box"><div class="ai-label">AI Correction</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkSentence()">Submit for correction</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
   }else if(pMode==='fill'){
     const blank=item.example.replace(new RegExp(`\\b${item.en}\\b`,'i'),'______');
-    html=`<div class="q-label">Completá la frase:</div>
+    html=`<div class="q-label">Complete the sentence:</div>
     <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}${item.type} ${item.pron||''}</div></div>
-    <input class="ans-inp" id="a-inp" placeholder="La palabra que falta..." onkeydown="if(event.key==='Enter')checkFill()"/>
-    <div class="ai-box" id="ai-box"><div class="ai-label">Resultado</div><div class="ai-text" id="ai-txt"></div></div>
-    <button class="btn-main" id="btn-check" onclick="checkFill()">Verificar</button>
-    <button class="btn-out" id="btn-next" onclick="nextQ()">Siguiente →</button>`;
+    <input class="ans-inp" id="a-inp" placeholder="The missing word..." onkeydown="if(event.key==='Enter')checkFill()"/>
+    <div class="ai-box" id="ai-box"><div class="ai-label">Result</div><div class="ai-text" id="ai-txt"></div></div>
+    <button class="btn-main" id="btn-check" onclick="checkFill()">Check</button>
+    <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
   }
   document.getElementById('p-body').innerHTML=html;
   if(document.getElementById('a-inp'))setTimeout(()=>document.getElementById('a-inp').focus(),100);
 }
 
-function doFlip(){document.getElementById('flip-card').classList.add('flipped');document.getElementById('eval-row').style.display='flex';}
-function selfEval(knew){if(knew)pCorrect++;nextQ();}
+function doFlip(){
+  const card=document.getElementById('flip-card');
+  const isFlipped=card.classList.contains('flipped');
+  card.classList.toggle('flipped');
+  // show eval buttons only when showing back side
+  document.getElementById('eval-row').style.display=isFlipped?'none':'flex';
+}
+async function selfEval(knew){
+  if(knew){
+    pCorrect++;
+    // mark word as learned
+    const item=pQueue[pIdx];
+    if(item&&item.en){
+      const w=words.find(x=>x.id===item.id);
+      if(w&&w.status!=='learned'){
+        w.status='learned';
+        saveLocal();
+        if(sheetURL) syncToSheet();
+      }
+    }
+  }
+  nextQ();
+}
 
 async function checkWord(){
   const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
@@ -903,15 +927,15 @@ async function getAI(prompt){
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
-    document.getElementById('ai-txt').textContent=d.content?.map(c=>c.text||'').join('')||'Sin respuesta.';
-  }catch{document.getElementById('ai-txt').textContent='No se pudo conectar con la IA.';}
+    document.getElementById('ai-txt').textContent=d.content?.map(c=>c.text||'').join('')||'No response.';
+  }catch{document.getElementById('ai-txt').textContent='Could not connect to AI.';}
 }
 
 function showResults(){
   const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
-  let title='¡Muy bien!';if(pct>=90)title='¡Excelente!';else if(pct<40)title='¡Seguí practicando!';
+  let title='Well done!';if(pct>=90)title='Excellent!';else if(pct<40)title='Keep practicing!';
   document.getElementById('r-title').textContent=title;
-  document.getElementById('r-sub').textContent=`${pct}% de aciertos`;
+  document.getElementById('r-sub').textContent=`${pct}% correct`;
   document.getElementById('r-correct').textContent=pCorrect;
   document.getElementById('r-total').textContent=pQueue.length;
   showScreen('s-result');
@@ -921,11 +945,11 @@ function showResults(){
 function openSyncModal(){document.getElementById('sheet-url-inp').value=sheetURL||'';document.getElementById('sync-modal').style.display='flex';}
 function closeSyncModal(e){if(e.target===document.getElementById('sync-modal'))document.getElementById('sync-modal').style.display='none';}
 async function saveSheetURL(){
-  const url=document.getElementById('sheet-url-inp').value.trim();if(!url){showToast('Pegá la URL del script');return;}
+  const url=document.getElementById('sheet-url-inp').value.trim();if(!url){showToast('Paste the script URL');return;}
   sheetURL=url;ls(SHEETK,url);
   document.getElementById('sheet-status-label').textContent='Conectado ✓';
   document.getElementById('sync-modal').style.display='none';
-  showToast('✓ URL guardada — cargando datos...');
+  showToast('✓ URL saved — loading data...');
   await syncFromSheet(false);
 }
 function exportData(){
@@ -941,8 +965,8 @@ function importJSON(e){
       const d=JSON.parse(ev.target.result);
       if(d.words){words=d.words;lsJ(WK,words);}
       if(d.sentences){sentences=d.sentences;lsJ(SK,sentences);}
-      await saveAndSync();updateStats();renderHomeRecent();renderVocab();showToast('✓ Datos importados');
-    }catch{showToast('Error al leer el archivo');}
+      await saveAndSync();updateStats();renderHomeRecent();renderVocab();showToast('✓ Data imported');
+    }catch{showToast('Error reading file');}
   };
   r.readAsText(file);
 }
