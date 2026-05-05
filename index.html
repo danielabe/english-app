@@ -287,7 +287,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     </div>
     <div class="prac-card" onclick="startMode('recall')">
       <div class="prac-glyph"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg></div>
-      <div class="prac-title">¿Lo sabés?</div>
+      <div class="prac-title">Do you know it?</div>
       <div class="prac-desc">Flip card</div>
     </div>
     <div class="prac-card" onclick="startMode('sentences')">
@@ -319,19 +319,24 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <button class="tab on" onclick="setVocabTab('learning',this)">To learn</button>
     <button class="tab" onclick="setVocabTab('learned',this)">Learned</button>
   </div>
-  <div class="chips">
-    <span class="chip on" onclick="setFilter('all',this)">Todas</span>
-    <span class="chip" onclick="setFilter('adj',this)">adj</span>
-    <span class="chip" onclick="setFilter('n',this)">n</span>
-    <span class="chip" onclick="setFilter('v',this)">v</span>
-    <span class="chip" onclick="setFilter('adv',this)">adv</span>
-    <span class="chip" onclick="setFilter('phrase',this)">sentences</span>
-    <span class="chip" onclick="setFilter('A1',this)">A1</span>
-    <span class="chip" onclick="setFilter('A2',this)">A2</span>
-    <span class="chip" onclick="setFilter('B1',this)">B1</span>
-    <span class="chip" onclick="setFilter('B2',this)">B2</span>
-    <span class="chip" onclick="setFilter('C1',this)">C1</span>
-    <span class="chip" onclick="setFilter('C2',this)">C2</span>
+  <div style="padding:0 16px 4px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);">Type</div>
+  <div class="chips" id="chips-type">
+    <span class="chip on" onclick="setTypeFilter('all',this)">All</span>
+    <span class="chip" onclick="setTypeFilter('adj',this)">adj</span>
+    <span class="chip" onclick="setTypeFilter('n',this)">n</span>
+    <span class="chip" onclick="setTypeFilter('v',this)">v</span>
+    <span class="chip" onclick="setTypeFilter('adv',this)">adv</span>
+    <span class="chip" onclick="setTypeFilter('phrase',this)">phrase</span>
+  </div>
+  <div style="padding:0 16px 4px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);">Level</div>
+  <div class="chips" id="chips-level">
+    <span class="chip on" onclick="setLevelFilter('all',this)">All</span>
+    <span class="chip" onclick="setLevelFilter('A1',this)">A1</span>
+    <span class="chip" onclick="setLevelFilter('A2',this)">A2</span>
+    <span class="chip" onclick="setLevelFilter('B1',this)">B1</span>
+    <span class="chip" onclick="setLevelFilter('B2',this)">B2</span>
+    <span class="chip" onclick="setLevelFilter('C1',this)">C1</span>
+    <span class="chip" onclick="setLevelFilter('C2',this)">C2</span>
   </div>
   <div id="vocab-list" class="wlist" style="padding-bottom:96px;"></div>
 </div>
@@ -340,7 +345,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <div id="s-add" class="screen">
   <div class="hdr">
     <div class="hdr-top">
-      <button class="hdr-pill" onclick="goBack()">← Volver</button>
+      <button class="hdr-pill" onclick="goBack()">← Back</button>
       <span class="app-name" style="font-size:20px;">Add</span>
     </div>
     <div class="hdr-sub">New words or import</div>
@@ -379,7 +384,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
       </div>
     </div>
     <div><div class="f-label">Example</div><textarea class="f-inp f-ta" id="f-ex" placeholder="Example sentence..."></textarea></div>
-    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Save</button><div style="height:16px;"></div>
+    <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Save</button><div style="height:96px;"></div>
   </div>
   <div id="add-import" style="display:none;padding:0 16px;">
     <div class="import-hint">Paste your PDF text line by line:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
@@ -398,7 +403,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- DETAIL -->
 <div id="s-detail" class="screen">
   <div class="hdr" style="padding-bottom:28px;">
-    <button class="hdr-pill" onclick="goBack()">← Volver</button>
+    <button class="hdr-pill" onclick="goBack()">← Back</button>
   </div>
   <div class="detail-hdr">
     <div class="detail-word" id="d-word"></div>
@@ -437,7 +442,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
       <div><div class="result-num" id="r-total">—</div><div class="result-numlabel">Total</div></div>
     </div>
     <button class="btn-main" onclick="showScreen('s-home')">Back to home</button>
-    <button class="btn-out" style="display:block;" onclick="startSameMode()">Practice de nuevo</button>
+    <button class="btn-out" style="display:block;" onclick="startSameMode()">Practice again</button>
   </div>
 </div>
 
@@ -523,7 +528,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <script>
 const WK='lingo_words',SK='lingo_sentences',SHEETK='lingo_sheet_url',STREAKK='lingo_streak';
 let words=[],sentences=[],sheetURL='',lastScreen='s-home';
-let vocabTab='learning',typeFilter='all',selWordType='adj',selWordLevel='';
+let vocabTab='learning',typeFilter='all',levelFilter='all',selWordType='adj',selWordLevel='';
 let curDetailId=null,pMode=null,pQueue=[],pIdx=0,pCorrect=0;
 
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
@@ -616,7 +621,7 @@ async function syncToSheet(){
   setSyncStatus('syncing','Saving to Sheet...');
   const streak=lsJ(STREAKK)||{count:0,lastDate:''};
   const res=await sheetPost({action:'saveAll',words,sentences,streak});
-  if(res&&res.ok){setSyncStatus('ok','Guardado en Sheet ✓');showToast('✓ All data saved to Google Sheet');}
+  if(res&&res.ok){setSyncStatus('ok','Saved to Sheet ✓');showToast('✓ All data saved to Google Sheet');}
   else{setSyncStatus('err','Error saving');showToast('Error saving to Sheet');}
 }
 
@@ -689,14 +694,23 @@ const LEVELS=['A1','A2','B1','B2','C1','C2'];
 function renderVocab(){
   const el=document.getElementById('vocab-list');
   let list=words.filter(w=>w.status===vocabTab);
-  if(typeFilter!=='all'){
-    if(LEVELS.includes(typeFilter)) list=list.filter(w=>w.level===typeFilter);
-    else list=list.filter(w=>w.type===typeFilter);
-  }
+  if(typeFilter!=='all') list=list.filter(w=>w.type===typeFilter);
+  if(levelFilter!=='all') list=list.filter(w=>w.level===levelFilter);
   el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
-function setFilter(f,el){typeFilter=f;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
+function setTypeFilter(f,el){
+  typeFilter=f;
+  document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderVocab();
+}
+function setLevelFilter(f,el){
+  levelFilter=f;
+  document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderVocab();
+}
 
 // ── DETAIL ────────────────────────────────────────
 function showDetail(id){
@@ -789,7 +803,7 @@ function buildSmartQueue(pool,total){
 
 function startMode(mode){
   pMode=mode;pIdx=0;pCorrect=0;
-  const names={'es-en':'ESP → ING','recall':'¿Lo sabés?','sentences':'Translate sentences','fill':'Fill in frase'};
+  const names={'es-en':'ESP → ING','recall':'Do you know it?','sentences':'Translate sentences','fill':'Fill in frase'};
   document.getElementById('p-title').textContent=names[mode]||mode;
   if(mode==='sentences'){
     pQueue=sentences.sort(()=>Math.random()-.5).slice(0,8);
