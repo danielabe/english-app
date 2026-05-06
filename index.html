@@ -237,6 +237,12 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sync-url-inp:focus{border-color:var(--pink);}
 .sync-url-inp::placeholder{color:var(--tx3);}
 
+
+/* SENTENCE LIST */
+.sitem{background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);padding:14px 16px;cursor:default;transition:border-color .15s;}
+.sitem-es{font-size:14px;color:var(--tx1);line-height:1.6;}
+.sitem-meta{font-size:11px;color:var(--tx3);margin-top:6px;}
+
 /* SENT CARD */
 .sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
 .sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
@@ -491,6 +497,33 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
 </div>
 
+<!-- SENTENCES -->
+<div id="s-sentences" class="screen">
+  <div class="hdr">
+    <div class="hdr-top">
+      <span class="app-name">Sentences</span>
+      <button class="hdr-pill" onclick="showScreen('s-add');setAddTabById('frases')">+ Add</button>
+    </div>
+    <div class="hdr-sub">All your practice sentences</div>
+  </div>
+  <div style="height:24px;"></div>
+  <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
+</div>
+
+<!-- SENTENCES -->
+<div id="s-sentences" class="screen">
+  <div class="hdr">
+    <div class="orb" style="width:100px;height:100px;top:-40px;right:-20px;background:rgba(193,105,214,.12);"></div>
+    <div class="hdr-top">
+      <span class="app-name">Sentences</span>
+      <span id="sent-count-pill" class="hdr-pill">0 sentences</span>
+    </div>
+    <div class="hdr-sub">Your Spanish sentences to translate</div>
+  </div>
+  <div style="height:24px;"></div>
+  <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
+</div>
+
 <!-- SYNC MODAL -->
 <div id="sync-modal" class="sync-modal" style="display:none;" onclick="closeSyncModal(event)">
   <div class="sync-modal-box">
@@ -518,6 +551,10 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <button class="nav-btn" id="nav-add" onclick="showScreen('s-add')">
     <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     <span class="nav-lbl">Add</span><span class="nav-dot"></span>
+  </button>
+  <button class="nav-btn" id="nav-sentences" onclick="showScreen('s-sentences')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="nav-lbl">Sentences</span><span class="nav-dot"></span>
   </button>
   <button class="nav-btn" id="nav-settings" onclick="showScreen('s-settings')">
     <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -636,11 +673,11 @@ function sampleWords(){return[
   {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null},
 ];}
 function sampleSentences(){return[
-  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning'},
-  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning'},
-  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning'},
-  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning'},
-  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning'},
+  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning',lastPracticed:null},
+  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning',lastPracticed:null},
+  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning',lastPracticed:null},
+  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning',lastPracticed:null},
+  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning',lastPracticed:null},
 ];}
 
 // ── SCREENS ───────────────────────────────────────
@@ -651,13 +688,13 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(!isPrac){
-    ['nav-home','nav-vocab','nav-add','nav-settings'].forEach(n=>document.getElementById(n).classList.remove('on'));
-    const m={'s-home':'nav-home','s-vocab':'nav-vocab','s-add':'nav-add','s-settings':'nav-settings'};
+    ['nav-home','nav-vocab','nav-add','nav-sentences','nav-settings'].forEach(n=>document.getElementById(n).classList.remove('on'));
+    const m={'s-home':'nav-home','s-vocab':'nav-vocab','s-add':'nav-add','s-sentences':'nav-sentences','s-settings':'nav-settings'};
     if(m[id])document.getElementById(m[id]).classList.add('on');
-    // only update lastScreen for main tabs, not overlays
     if(!isOverlay) lastScreen=id;
   }
   if(id==='s-vocab')renderVocab();
+  if(id==='s-sentences')renderSentencesList();
   if(id==='s-home'){updateStats();renderHomeRecent();}
 }
 function goBack(){showScreen(lastScreen);}
@@ -666,6 +703,31 @@ function updateStats(){
   document.getElementById('st-total').textContent=words.length;
   document.getElementById('st-learned').textContent=words.filter(w=>w.status==='learned').length;
   document.getElementById('st-sentences').textContent=sentences.length;
+}
+
+function renderSentences(){
+  const el=document.getElementById('sentences-list');
+  const pill=document.getElementById('sent-count-pill');
+  if(pill) pill.textContent=`${sentences.length} sentence${sentences.length!==1?'s':''}`;
+  if(!sentences.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-text">No sentences yet. Import some in Add.</div></div>`;
+    return;
+  }
+  // sort by lastPracticed ascending (never practiced first)
+  const sorted=[...sentences].sort((a,b)=>{
+    if(!a.lastPracticed&&!b.lastPracticed) return 0;
+    if(!a.lastPracticed) return -1;
+    if(!b.lastPracticed) return 1;
+    return new Date(a.lastPracticed)-new Date(b.lastPracticed);
+  });
+  el.innerHTML=sorted.map(s=>{
+    const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
+    const meta=daysAgo===null?'Never practiced':(daysAgo===0?'Practiced today':(daysAgo===1?'Practiced yesterday':`Practiced ${daysAgo} days ago`));
+    return `<div class="sitem">
+      <div class="sitem-es">${s.es}</div>
+      <div class="sitem-meta">${meta}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── WORD LIST ─────────────────────────────────────
@@ -699,6 +761,37 @@ function renderVocab(){
   el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
+
+function renderSentencesList(){
+  const el=document.getElementById('sentences-list');
+  if(!el) return;
+  if(!sentences.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">No sentences yet — add some!</div></div>`;
+    return;
+  }
+  el.innerHTML=sentences.map((s,i)=>{
+    const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/(86400000)):null;
+    const practInfo=daysAgo===null?'<span style="font-size:10px;color:var(--tx3);">Never practiced</span>'
+      :(daysAgo===0?'<span style="font-size:10px;color:var(--ok);">· today</span>'
+      :`<span style="font-size:10px;color:var(--tx3);">· ${daysAgo}d ago</span>`);
+    return `<div class="witem" style="align-items:flex-start;gap:10px;">
+      <span class="wtype" style="margin-top:2px;">${i+1}</span>
+      <div class="winfo">
+        <div style="font-size:14px;color:var(--tx1);line-height:1.5;">${s.es}</div>
+        <div style="margin-top:4px;">${practInfo}</div>
+      </div>
+      <button onclick="deleteSentence(${s.id})" style="background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:0 4px;flex-shrink:0;">×</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteSentence(id){
+  sentences=sentences.filter(s=>s.id!==id);
+  saveAndSync();
+  renderSentencesList();
+  updateStats();
+  showToast('Sentence deleted');
+}
 function setTypeFilter(f,el){
   typeFilter=f;
   document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));
@@ -778,7 +871,7 @@ async function importWords(){
 async function importSentences(){
   const text=document.getElementById('fras-text').value.trim();if(!text)return;
   let count=0;
-  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning'});count++;});
+  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning',lastPracticed:null});count++;});
   await saveAndSync();updateStats();
   document.getElementById('fras-result').textContent=`✓ ${count} sentences importadas`;
   document.getElementById('fras-text').value='';showToast(`✓ ${count} sentences importadas`);
@@ -947,7 +1040,26 @@ async function getAI(prompt){
 
 function showResults(){
   const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
-  let title='Well done!';if(pct>=90)title='Excellent!';else if(pct<40)title='Keep practicing!';
+  let title='Excellent!', iconSVG, iconBg;
+  if(pct>=80){
+    title='Excellent!';
+    iconBg='rgba(74,222,128,.15)';
+    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';
+  } else if(pct>=50){
+    title='Well done!';
+    iconBg='rgba(193,105,214,.15)';
+    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';
+  } else if(pct>=20){
+    title='Keep going!';
+    iconBg='rgba(251,191,36,.15)';
+    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  } else {
+    title='Keep practicing!';
+    iconBg='rgba(248,113,113,.15)';
+    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#f87171;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+  }
+  document.getElementById('r-icon').style.background=iconBg;
+  document.getElementById('r-icon').innerHTML=iconSVG;
   document.getElementById('r-title').textContent=title;
   document.getElementById('r-sub').textContent=`${pct}% correct`;
   document.getElementById('r-correct').textContent=pCorrect;
