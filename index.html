@@ -243,6 +243,38 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sitem-es{font-size:14px;color:var(--tx1);line-height:1.6;}
 .sitem-meta{font-size:11px;color:var(--tx3);margin-top:6px;}
 
+
+/* SENTENCE DETAIL MODAL */
+.sent-modal{position:fixed;inset:0;background:rgba(21,13,14,.8);z-index:400;display:flex;align-items:flex-end;justify-content:center;}
+.sent-modal-box{background:var(--surface);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:430px;animation:slideup .3s ease;border-top:1px solid var(--border2);max-height:90vh;overflow-y:auto;}
+.sent-modal-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:8px;}
+.sent-modal-es{font-size:18px;color:var(--mist);line-height:1.6;margin-bottom:20px;font-family:'Playfair Display',serif;}
+.sent-modal-divider{height:1px;background:var(--border);margin:16px 0;}
+.sent-modal-en{font-size:15px;color:var(--tx1);line-height:1.7;margin-bottom:10px;padding:12px 14px;background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);}
+.sent-modal-en-empty{font-size:14px;color:var(--tx3);font-style:italic;padding:12px 0;}
+.sent-modal-close{width:100%;padding:13px;background:transparent;color:var(--tx2);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;margin-top:8px;}
+.sent-modal-close:active{background:var(--surface2);}
+.sent-modal-lastprac{font-size:11px;color:var(--tx3);margin-bottom:16px;}
+
+/* MIC BUTTON */
+.mic-wrap{position:relative;margin-bottom:12px;}
+.mic-wrap .ans-inp{padding-right:52px;margin-bottom:0;}
+.mic-wrap .ans-ta{padding-right:52px;}
+.mic-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(193,105,214,.15);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.mic-btn svg{width:16px;height:16px;stroke:var(--pink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.mic-btn.listening{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.4);animation:mic-pulse 1s infinite;}
+.mic-btn.listening svg{stroke:var(--err);}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.3)}50%{box-shadow:0 0 0 6px rgba(248,113,113,.0)}}
+.mic-ta-wrap{position:relative;margin-bottom:12px;}
+.mic-ta-wrap .ans-ta{margin-bottom:0;padding-right:52px;}
+.mic-ta-wrap .mic-btn{top:16px;transform:none;}
+
+/* SITEM clickable */
+.sitem{cursor:pointer;transition:border-color .15s;}
+.sitem:active{border-color:var(--pink);}
+.sitem-has-translation::after{content:'›';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:18px;}
+.sitem{position:relative;}
+
 /* SENT CARD */
 .sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
 .sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
@@ -524,6 +556,19 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
 </div>
 
+<!-- SENTENCE DETAIL MODAL -->
+<div id="sent-modal" class="sent-modal" style="display:none;" onclick="closeSentModal(event)">
+  <div class="sent-modal-box">
+    <div class="sent-modal-label">Spanish</div>
+    <div class="sent-modal-es" id="sent-modal-es"></div>
+    <div class="sent-modal-lastprac" id="sent-modal-meta"></div>
+    <div class="sent-modal-divider"></div>
+    <div class="sent-modal-label">English translation(s)</div>
+    <div id="sent-modal-translations"></div>
+    <button class="sent-modal-close" onclick="document.getElementById('sent-modal').style.display='none'">Close</button>
+  </div>
+</div>
+
 <!-- SYNC MODAL -->
 <div id="sync-modal" class="sync-modal" style="display:none;" onclick="closeSyncModal(event)">
   <div class="sync-modal-box">
@@ -673,11 +718,11 @@ function sampleWords(){return[
   {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null},
 ];}
 function sampleSentences(){return[
-  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning',lastPracticed:null},
-  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning',lastPracticed:null},
-  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning',lastPracticed:null},
-  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning',lastPracticed:null},
-  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning',lastPracticed:null},
+  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning',lastPracticed:null,translations:['She works at a large company and always arrives on time to meetings.']},
+  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning',lastPracticed:null,translations:['She usually does not make important decisions without talking to her team first.']},
+  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning',lastPracticed:null,translations:['Sometimes she finds it hard to concentrate when there is a lot of noise.']},
+  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning',lastPracticed:null,translations:['This system does not work properly if it is not set up correctly.']},
+  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning',lastPracticed:null,translations:['She almost never agrees with the decisions made by management.']},
 ];}
 
 // ── SCREENS ───────────────────────────────────────
@@ -723,9 +768,10 @@ function renderSentences(){
   el.innerHTML=sorted.map(s=>{
     const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
     const meta=daysAgo===null?'Never practiced':(daysAgo===0?'Practiced today':(daysAgo===1?'Practiced yesterday':`Practiced ${daysAgo} days ago`));
-    return `<div class="sitem">
+    const hasTranslation=s.translations&&s.translations.length>0;
+    return `<div class="sitem${hasTranslation?' sitem-has-translation':''}" onclick="openSentModal(${s.id})">
       <div class="sitem-es">${s.es}</div>
-      <div class="sitem-meta">${meta}</div>
+      <div class="sitem-meta">${meta}${hasTranslation?' · '+s.translations.length+' translation(s)':''}</div>
     </div>`;
   }).join('');
 }
@@ -871,7 +917,7 @@ async function importWords(){
 async function importSentences(){
   const text=document.getElementById('fras-text').value.trim();if(!text)return;
   let count=0;
-  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning',lastPracticed:null});count++;});
+  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning',lastPracticed:null,translations:[]});count++;});
   await saveAndSync();updateStats();
   document.getElementById('fras-result').textContent=`✓ ${count} sentences importadas`;
   document.getElementById('fras-text').value='';showToast(`✓ ${count} sentences importadas`);
@@ -932,7 +978,7 @@ function renderQ(){
   if(pMode==='es-en'){
     html=`<div class="q-label">How do you say it in English?</div>
     <div class="q-card"><div class="q-word">${item.es||item.en}</div><div class="q-sub">${lvlTag}${item.type||''}</div></div>
-    <input class="ans-inp" id="a-inp" placeholder="Type in English..." onkeydown="if(event.key==='Enter')checkWord()"/>
+    <div class="mic-wrap"><input class="ans-inp" id="a-inp" placeholder="Type in English..." onkeydown="if(event.key==='Enter')checkWord()"/><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">Correction</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkWord()">Check</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
@@ -959,7 +1005,7 @@ function renderQ(){
   }else if(pMode==='sentences'){
     html=`<div class="q-label">Translate to English:</div>
     <div class="sent-card"><div class="sent-es">${item.es}</div><div class="sent-hint">Write the best you can</div></div>
-    <textarea class="ans-inp ans-ta" id="a-inp" placeholder="Your translation here..."></textarea>
+    <div class="mic-ta-wrap"><textarea class="ans-inp ans-ta" id="a-inp" placeholder="Your translation here..."></textarea><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">AI Correction</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkSentence()">Submit for correction</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
@@ -967,7 +1013,7 @@ function renderQ(){
     const blank=item.example.replace(new RegExp(`\\b${item.en}\\b`,'i'),'______');
     html=`<div class="q-label">Complete the sentence:</div>
     <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}${item.type} ${item.pron||''}</div></div>
-    <input class="ans-inp" id="a-inp" placeholder="The missing word..." onkeydown="if(event.key==='Enter')checkFill()"/>
+    <div class="mic-wrap"><input class="ans-inp" id="a-inp" placeholder="The missing word..." onkeydown="if(event.key==='Enter')checkFill()"/><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">Result</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkFill()">Check</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
@@ -1095,6 +1141,69 @@ function importJSON(e){
     }catch{showToast('Error reading file');}
   };
   r.readAsText(file);
+}
+
+
+// ── SENTENCE MODAL ────────────────────────────────
+function openSentModal(id){
+  const s=sentences.find(x=>x.id===id);if(!s)return;
+  document.getElementById('sent-modal-es').textContent=s.es;
+  const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
+  document.getElementById('sent-modal-meta').textContent=
+    daysAgo===null?'Never practiced':(daysAgo===0?'Practiced today':(daysAgo===1?'Practiced yesterday':`Practiced ${daysAgo} days ago`));
+  const tEl=document.getElementById('sent-modal-translations');
+  if(s.translations&&s.translations.length){
+    tEl.innerHTML=s.translations.map(t=>`<div class="sent-modal-en">${t}</div>`).join('');
+  } else {
+    tEl.innerHTML='<div class="sent-modal-en-empty">No translations added yet. Add them in your Google Sheet (columns en1, en2, en3).</div>';
+  }
+  document.getElementById('sent-modal').style.display='flex';
+}
+function closeSentModal(e){if(e.target===document.getElementById('sent-modal'))document.getElementById('sent-modal').style.display='none';}
+
+
+// ── MICROPHONE (Web Speech API) ───────────────────
+let micRecognition=null, micActive=false;
+
+function toggleMic(inputId){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    showToast('Speech recognition not supported in this browser');return;
+  }
+  if(micActive){stopMic();return;}
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  micRecognition=new SpeechRecognition();
+  micRecognition.lang='en-US';
+  micRecognition.continuous=false;
+  micRecognition.interimResults=false;
+
+  micRecognition.onstart=()=>{
+    micActive=true;
+    const btn=document.getElementById('mic-btn');
+    if(btn) btn.classList.add('listening');
+    showToast('🎤 Listening...');
+  };
+  micRecognition.onresult=(e)=>{
+    const transcript=e.results[0][0].transcript;
+    const inp=document.getElementById(inputId);
+    if(inp){
+      // for textarea append, for input replace
+      if(inp.tagName==='TEXTAREA') inp.value=(inp.value?inp.value+' ':'')+transcript;
+      else inp.value=transcript;
+    }
+  };
+  micRecognition.onerror=(e)=>{
+    showToast('Mic error: '+e.error);
+    stopMic();
+  };
+  micRecognition.onend=()=>{ stopMic(); };
+  micRecognition.start();
+}
+
+function stopMic(){
+  micActive=false;
+  const btn=document.getElementById('mic-btn');
+  if(btn) btn.classList.remove('listening');
+  if(micRecognition){try{micRecognition.stop();}catch(e){} micRecognition=null;}
 }
 
 // ── TOAST ─────────────────────────────────────────
