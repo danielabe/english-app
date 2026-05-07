@@ -237,14 +237,27 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sync-url-inp:focus{border-color:var(--pink);}
 .sync-url-inp::placeholder{color:var(--tx3);}
 
+/* SENT CARD */
+.sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
+.sent-hint{font-size:11px;color:var(--tx3);margin-top:6px;}
 
-/* SENTENCE LIST */
-.sitem{background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);padding:14px 16px;cursor:pointer;transition:border-color .15s;}
-.sitem-es{font-size:14px;color:var(--tx1);line-height:1.6;}
-.sitem-meta{font-size:11px;color:var(--tx3);margin-top:6px;}
+/* SENTENCE DETAIL */
+.sent-detail-hero{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 32px;position:relative;overflow:hidden;}
+.sent-detail-es{font-family:'Playfair Display',serif;font-size:22px;color:var(--mist);line-height:1.45;position:relative;z-index:1;}
+.sent-detail-meta{font-size:12px;color:var(--tx2);margin-top:10px;font-weight:300;position:relative;z-index:1;}
 
+.trans-card{background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);padding:14px 16px;margin-bottom:8px;}
+.trans-card-text{font-size:14px;color:var(--tx1);line-height:1.65;}
+.trans-card-num{font-size:10px;font-weight:700;color:var(--pink);letter-spacing:.06em;margin-bottom:4px;text-transform:uppercase;}
 
+.trans-empty{font-size:13px;color:var(--tx3);font-style:italic;padding:10px 0;}
 
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:var(--tx3);}
+.empty-icon{width:56px;height:56px;border-radius:50%;background:rgba(193,105,214,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.empty-icon svg{width:24px;height:24px;stroke:var(--soft);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.empty-text{font-size:14px;}
 
 /* MIC BUTTON */
 .mic-wrap{position:relative;margin-bottom:12px;}
@@ -258,28 +271,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .mic-ta-wrap{position:relative;margin-bottom:12px;}
 .mic-ta-wrap .ans-ta{margin-bottom:0;padding-right:52px;}
 .mic-ta-wrap .mic-btn{top:16px;transform:none;}
-
-/* SITEM clickable */
-.sitem{cursor:pointer;transition:border-color .15s;}
-.sitem:active{border-color:var(--pink);}
-.sitem-has-translation::after{content:'›';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:18px;}
-.sitem{position:relative;}
-
-
-/* SENTENCE TRANSLATION ITEM */
-.sent-trans-item{font-size:15px;color:var(--tx1);line-height:1.7;padding:12px 14px;background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);margin-bottom:8px;}
-.sent-trans-empty{font-size:14px;color:var(--tx3);font-style:italic;}
-
-/* SENT CARD */
-.sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
-.sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
-.sent-hint{font-size:11px;color:var(--tx3);margin-top:6px;}
-
-/* EMPTY */
-.empty{text-align:center;padding:48px 24px;color:var(--tx3);}
-.empty-icon{width:56px;height:56px;border-radius:50%;background:rgba(193,105,214,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
-.empty-icon svg{width:24px;height:24px;stroke:var(--soft);fill:none;stroke-width:1.8;stroke-linecap:round;}
-.empty-text{font-size:14px;}
 
 /* TOAST */
 .toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);color:var(--tx1);border:1px solid var(--border2);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:500;max-width:90%;}
@@ -433,7 +424,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
 </div>
 
-<!-- DETAIL -->
+<!-- DETAIL (word) -->
 <div id="s-detail" class="screen">
   <div class="hdr" style="padding-bottom:28px;">
     <button class="hdr-pill" onclick="goBack()">← Back</button>
@@ -451,6 +442,38 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div class="detail-section" style="margin:0 16px 10px;"><div class="detail-sec-label">Status</div><div class="status-row" id="d-status"></div></div>
   <button class="btn-danger" onclick="deleteWord()">Delete word</button><div style="height:62px;"></div>
+</div>
+
+<!-- SENTENCE DETAIL (new full screen) -->
+<div id="s-sent-detail" class="screen">
+  <!-- hero with the Spanish sentence -->
+  <div class="sent-detail-hero">
+    <div class="orb" style="width:120px;height:120px;top:-40px;right:-30px;background:rgba(193,105,214,.10);"></div>
+    <button class="hdr-pill" style="margin-bottom:20px;display:inline-block;" onclick="goBack()">← Back</button>
+    <div class="sent-detail-es" id="sd-es"></div>
+    <div class="sent-detail-meta" id="sd-meta"></div>
+  </div>
+
+  <!-- translations -->
+  <div style="padding:20px 16px 0;">
+    <div class="sec-label" style="padding:0;margin:0 0 10px;">English translation(s)</div>
+    <div id="sd-translations"></div>
+  </div>
+
+  <!-- last practiced -->
+  <div class="detail-section" style="margin-top:16px;">
+    <div class="detail-sec-label">Last practiced</div>
+    <div class="detail-sec-text" id="sd-lastprac">Never</div>
+  </div>
+
+  <!-- status -->
+  <div class="detail-section">
+    <div class="detail-sec-label">Status</div>
+    <div class="status-row" id="sd-status"></div>
+  </div>
+
+  <button class="btn-danger" onclick="deleteSentenceFromDetail()">Delete sentence</button>
+  <div style="height:80px;"></div>
 </div>
 
 <!-- PRACTICE -->
@@ -524,20 +547,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
 </div>
 
-<!-- SENTENCES -->
-<div id="s-sentences" class="screen">
-  <div class="hdr">
-    <div class="hdr-top">
-      <span class="app-name">Sentences</span>
-      <button class="hdr-pill" onclick="showScreen('s-add');setAddTabById('frases')">+ Add</button>
-    </div>
-    <div class="hdr-sub">All your practice sentences</div>
-  </div>
-  <div style="height:24px;"></div>
-  <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
-</div>
-
-<!-- SENTENCES -->
+<!-- SENTENCES LIST -->
 <div id="s-sentences" class="screen">
   <div class="hdr">
     <div class="orb" style="width:100px;height:100px;top:-40px;right:-20px;background:rgba(193,105,214,.12);"></div>
@@ -549,25 +559,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div style="height:24px;"></div>
   <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
-</div>
-
-<!-- SENTENCE DETAIL SCREEN -->
-<div id="s-sent-detail" class="screen">
-  <div class="hdr" style="padding-bottom:28px;">
-    <button class="hdr-pill" onclick="goBack()">← Back</button>
-  </div>
-  <div class="detail-hdr">
-    <div class="detail-word" id="sd-es" style="font-size:20px;line-height:1.5;"></div>
-  </div>
-  <div class="detail-section">
-    <div class="detail-sec-label">Last practiced</div>
-    <div class="detail-sec-text" id="sd-lastprac">Never</div>
-  </div>
-  <div class="detail-section" id="sd-trans-wrap">
-    <div class="detail-sec-label">English translation(s)</div>
-    <div id="sd-translations"></div>
-  </div>
-  <div style="height:96px;"></div>
 </div>
 
 <!-- SYNC MODAL -->
@@ -612,7 +603,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 const WK='lingo_words',SK='lingo_sentences',SHEETK='lingo_sheet_url',STREAKK='lingo_streak';
 let words=[],sentences=[],sheetURL='',lastScreen='s-home';
 let vocabTab='learning',typeFilter='all',levelFilter='all',selWordType='adj',selWordLevel='';
-let curDetailId=null,pMode=null,pQueue=[],pIdx=0,pCorrect=0;
+let curDetailId=null,curSentDetailId=null,pMode=null,pQueue=[],pIdx=0,pCorrect=0;
 
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
 const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';};
@@ -751,48 +742,6 @@ function updateStats(){
   document.getElementById('st-sentences').textContent=sentences.length;
 }
 
-function renderSentences(){
-  var el=document.getElementById('sentences-list');
-  var pill=document.getElementById('sent-count-pill');
-  if(pill) pill.textContent=sentences.length+' sentence'+(sentences.length!==1?'s':'');
-  while(el.firstChild) el.removeChild(el.firstChild);
-  if(!sentences.length){
-    var empty=document.createElement('div');
-    empty.className='empty';
-    empty.innerHTML='<div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-text">No sentences yet. Import some in Add.</div>';
-    el.appendChild(empty);
-    return;
-  }
-  var sorted=sentences.slice().sort(function(a,b){
-    if(!a.lastPracticed&&!b.lastPracticed) return 0;
-    if(!a.lastPracticed) return -1;
-    if(!b.lastPracticed) return 1;
-    return new Date(a.lastPracticed)-new Date(b.lastPracticed);
-  });
-  window.sentList=sorted;
-  for(var i=0;i<sorted.length;i++){
-    (function(idx){
-      var s=sorted[idx];
-      var daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-      var meta=daysAgo===null?'Never practiced':(daysAgo===0?'Practiced today':(daysAgo===1?'Practiced yesterday':'Practiced '+daysAgo+' days ago'));
-      var hasT=s.translations&&s.translations.length>0;
-      var div=document.createElement('div');
-      div.className='sitem'+(hasT?' sitem-has-translation':'');
-      var esDiv=document.createElement('div');
-      esDiv.className='sitem-es';
-      esDiv.textContent=s.es;
-      var metaDiv=document.createElement('div');
-      metaDiv.className='sitem-meta';
-      metaDiv.textContent=meta+(hasT?' · '+s.translations.length+' translation(s)':'');
-      div.appendChild(esDiv);
-      div.appendChild(metaDiv);
-      div.addEventListener('click',function(){openSentModal(idx);});
-      el.appendChild(div);
-    })(i);
-  }
-}
-
-
 // ── WORD LIST ─────────────────────────────────────
 function wHTML(w){
   const pct=w.status==='learned'?100:25;
@@ -815,7 +764,6 @@ function renderHomeRecent(){
   const r=[...words].reverse().slice(0,4);
   el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Add your first words</div></div>`;
 }
-const LEVELS=['A1','A2','B1','B2','C1','C2'];
 function renderVocab(){
   const el=document.getElementById('vocab-list');
   let list=words.filter(w=>w.status===vocabTab);
@@ -825,50 +773,113 @@ function renderVocab(){
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
 
+// ── SENTENCES LIST ────────────────────────────────
 function renderSentencesList(){
   const el=document.getElementById('sentences-list');
   if(!el) return;
+
+  // update pill count
+  const pill=document.getElementById('sent-count-pill');
+  if(pill) pill.textContent=sentences.length+' sentence'+(sentences.length!==1?'s':'');
+
   if(!sentences.length){
     el.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">No sentences yet — add some!</div></div>`;
     return;
   }
-  el.innerHTML=sentences.map((s,i)=>{
-    const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/(86400000)):null;
-    const practInfo=daysAgo===null?'<span style="font-size:10px;color:var(--tx3);">Never practiced</span>'
-      :(daysAgo===0?'<span style="font-size:10px;color:var(--ok);">· today</span>'
-      :`<span style="font-size:10px;color:var(--tx3);">· ${daysAgo}d ago</span>`);
-    return `<div class="witem" style="align-items:flex-start;gap:10px;">
+
+  // sort: never practiced first, then oldest
+  const sorted=[...sentences].sort((a,b)=>{
+    if(!a.lastPracticed&&!b.lastPracticed) return 0;
+    if(!a.lastPracticed) return -1;
+    if(!b.lastPracticed) return 1;
+    return new Date(a.lastPracticed)-new Date(b.lastPracticed);
+  });
+
+  el.innerHTML=sorted.map((s,i)=>{
+    const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
+    const practInfo=daysAgo===null
+      ?'<span style="font-size:11px;color:var(--tx3);">Never practiced</span>'
+      :(daysAgo===0
+        ?'<span style="font-size:11px;color:var(--ok);">Practiced today</span>'
+        :`<span style="font-size:11px;color:var(--tx3);">${daysAgo}d ago</span>`);
+    const hasT=s.translations&&s.translations.length>0;
+    const statusDot=s.status==='learned'
+      ?'<span style="font-size:10px;color:var(--ok);font-weight:600;">✓ learned</span>'
+      :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
+    return `<div class="witem" style="align-items:flex-start;gap:10px;" onclick="showSentDetail(${s.id})">
       <span class="wtype" style="margin-top:2px;">${i+1}</span>
       <div class="winfo">
         <div style="font-size:14px;color:var(--tx1);line-height:1.5;">${s.es}</div>
-        <div style="margin-top:4px;">${practInfo}</div>
+        <div style="margin-top:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          ${practInfo}
+          ${hasT?'<span style="font-size:10px;color:var(--pink);">'+s.translations.length+' translation'+(s.translations.length>1?'s':'')+'</span>':''}
+          ${statusDot}
+        </div>
       </div>
-      <button onclick="deleteSentence(${s.id})" style="background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:0 4px;flex-shrink:0;">×</button>
+      <span style="color:var(--tx3);font-size:18px;flex-shrink:0;">›</span>
     </div>`;
   }).join('');
 }
 
-function deleteSentence(id){
-  sentences=sentences.filter(s=>s.id!==id);
-  saveAndSync();
-  renderSentencesList();
-  updateStats();
-  showToast('Sentence deleted');
-}
-function setTypeFilter(f,el){
-  typeFilter=f;
-  document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderVocab();
-}
-function setLevelFilter(f,el){
-  levelFilter=f;
-  document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderVocab();
+// ── SENTENCE DETAIL ───────────────────────────────
+function showSentDetail(id){
+  const s=sentences.find(x=>x.id===id);
+  if(!s) return;
+  curSentDetailId=id;
+  lastScreen=document.querySelector('.screen.active').id;
+
+  // Spanish sentence
+  document.getElementById('sd-es').textContent=s.es;
+
+  // number of translations hint
+  const hasT=s.translations&&s.translations.length>0;
+  document.getElementById('sd-meta').textContent=hasT
+    ?s.translations.length+' translation'+(s.translations.length>1?'s':'')+' available'
+    :'No translations yet';
+
+  // translations
+  const tEl=document.getElementById('sd-translations');
+  if(hasT){
+    tEl.innerHTML=s.translations.map((t,i)=>`
+      <div class="trans-card">
+        ${s.translations.length>1?`<div class="trans-card-num">Option ${i+1}</div>`:''}
+        <div class="trans-card-text">${t}</div>
+      </div>`).join('');
+  } else {
+    tEl.innerHTML='<div class="trans-empty">No translations yet. Add them in Google Sheet (columns en1, en2, en3...).</div>';
+  }
+
+  // last practiced
+  const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
+  document.getElementById('sd-lastprac').textContent=
+    daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
+
+  // status buttons
+  document.getElementById('sd-status').innerHTML=`
+    <button class="status-btn status-learning ${s.status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${s.status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
+
+  showScreen('s-sent-detail');
 }
 
-// ── DETAIL ────────────────────────────────────────
+async function setSentStatus(status){
+  const s=sentences.find(x=>x.id===curSentDetailId);
+  if(!s) return;
+  s.status=status;
+  await saveAndSync();
+  showSentDetail(curSentDetailId); // re-render detail
+  showToast(status==='learned'?'✓ Marked as learned':'Moved to to learn');
+}
+
+function deleteSentenceFromDetail(){
+  if(!confirm('Delete this sentence? This cannot be undone.')) return;
+  sentences=sentences.filter(s=>s.id!==curSentDetailId);
+  saveAndSync();
+  goBack();
+  showToast('Sentence deleted');
+}
+
+// ── WORD DETAIL ───────────────────────────────────
 function showDetail(id){
   const w=words.find(x=>x.id===id);if(!w)return;
   curDetailId=id;lastScreen=document.querySelector('.screen.active').id;
@@ -878,11 +889,9 @@ function showDetail(id){
   document.getElementById('d-es').textContent=w.es||'—';
   document.getElementById('d-ex').textContent=w.example||'—';
   document.getElementById('d-ex-wrap').style.display=w.example?'block':'none';
-  // level badge
   const lvlEl=document.getElementById('d-level');
   if(w.level){lvlEl.textContent=w.level;lvlEl.className=`lvl-badge lvl-${w.level}`;}
   else{lvlEl.textContent='—';lvlEl.className='detail-sec-text';}
-  // last practiced
   const lpEl=document.getElementById('d-lastprac');
   if(w.lastPracticed){const d=Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24));lpEl.textContent=d===0?'Today':(d===1?'Yesterday':`Last ${d} days`);}
   else lpEl.textContent='Never';
@@ -914,7 +923,6 @@ async function addManual(){
   words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,level:selWordLevel,example:document.getElementById('f-ex').value.trim(),status:'learning',lastPracticed:null});
   await saveAndSync();updateStats();
   ['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');
-  // reset level selector
   document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));
   document.getElementById('lp-none').classList.add('on');
   selWordLevel='';
@@ -947,12 +955,12 @@ function buildSmartQueue(pool,total){
   const scored=pool.map(w=>{
     let score=0;
     const daysSince=w.lastPracticed?Math.floor((now-new Date(w.lastPracticed))/dayMs):999;
-    score+=Math.min(daysSince,30)*2;          // hasta 60pts por tiempo sin practicar
-    if(!w.lastPracticed) score+=20;           // bonus por nunca practicada
-    if(w.level==='C1'||w.level==='C2') score+=15; // palabras difíciles aparecen más
-    if(w.level==='A1'||w.level==='A2') score+=8;  // fáciles también se repasan
-    if(w.status==='learned') score-=5;        // aprendidas bajan un poco
-    score+=Math.random()*15;                  // aleatoriedad
+    score+=Math.min(daysSince,30)*2;
+    if(!w.lastPracticed) score+=20;
+    if(w.level==='C1'||w.level==='C2') score+=15;
+    if(w.level==='A1'||w.level==='A2') score+=8;
+    if(w.status==='learned') score-=5;
+    score+=Math.random()*15;
     return {w,score};
   });
   return scored.sort((a,b)=>b.score-a.score).slice(0,total).map(s=>s.w).sort(()=>Math.random()-.5);
@@ -1043,22 +1051,16 @@ function doFlip(){
   const card=document.getElementById('flip-card');
   const isFlipped=card.classList.contains('flipped');
   card.classList.toggle('flipped');
-  // show eval buttons only when showing back side
   document.getElementById('eval-row').style.display=isFlipped?'none':'flex';
 }
 async function selfEval(knew){
-  // disable buttons immediately to prevent double-tap
   document.querySelectorAll('.eval-btn').forEach(b=>b.disabled=true);
   if(knew){
     pCorrect++;
     const item=pQueue[pIdx];
     if(item&&item.en){
       const w=words.find(x=>x.id===item.id);
-      if(w&&w.status!=='learned'){
-        w.status='learned';
-        saveLocal();
-        if(sheetURL) syncToSheet();
-      }
+      if(w&&w.status!=='learned'){w.status='learned';saveLocal();if(sheetURL) syncToSheet();}
     }
   }
   nextQ();
@@ -1089,11 +1091,8 @@ function checkFill(){
 }
 function nextQ(){
   pIdx++;
-  if(pIdx>=pQueue.length){
-    showResults();
-  } else {
-    renderQ();
-  }
+  if(pIdx>=pQueue.length) showResults();
+  else renderQ();
 }
 
 function showFB(text,loading){
@@ -1112,23 +1111,10 @@ async function getAI(prompt){
 function showResults(){
   const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
   let title='Excellent!', iconSVG, iconBg;
-  if(pct>=80){
-    title='Excellent!';
-    iconBg='rgba(74,222,128,.15)';
-    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';
-  } else if(pct>=50){
-    title='Well done!';
-    iconBg='rgba(193,105,214,.15)';
-    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';
-  } else if(pct>=20){
-    title='Keep going!';
-    iconBg='rgba(251,191,36,.15)';
-    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-  } else {
-    title='Keep practicing!';
-    iconBg='rgba(248,113,113,.15)';
-    iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#f87171;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-  }
+  if(pct>=80){title='Excellent!';iconBg='rgba(74,222,128,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
+  else if(pct>=50){title='Well done!';iconBg='rgba(193,105,214,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
+  else if(pct>=20){title='Keep going!';iconBg='rgba(251,191,36,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';}
+  else{title='Keep practicing!';iconBg='rgba(248,113,113,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#f87171;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';}
   document.getElementById('r-icon').style.background=iconBg;
   document.getElementById('r-icon').innerHTML=iconSVG;
   document.getElementById('r-title').textContent=title;
@@ -1168,69 +1154,21 @@ function importJSON(e){
   r.readAsText(file);
 }
 
-
-// ── SENTENCE MODAL ────────────────────────────────
-function openSentModal(idx){
-  const s=window.sentList&&window.sentList[idx];
-  if(!s) return;
-  // populate detail screen
-  document.getElementById('sd-es').textContent=s.es;
-  const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-  document.getElementById('sd-lastprac').textContent=
-    daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
-  const tEl=document.getElementById('sd-translations');
-  if(s.translations&&s.translations.length){
-    tEl.innerHTML=s.translations.map(t=>'<div class="sent-trans-item">'+t+'</div>').join('');
-  } else {
-    tEl.innerHTML='<div class="sent-trans-empty">No translations yet — add them in Google Sheet (columns en1, en2, en3).</div>';
-  }
-  showScreen('s-sent-detail');
-}
-
-
-// ── MICROPHONE (Web Speech API) ───────────────────
+// ── MICROPHONE ────────────────────────────────────
 let micRecognition=null, micActive=false;
-
 function toggleMic(inputId){
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
-    showToast('Speech recognition not supported in this browser');return;
-  }
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){showToast('Speech recognition not supported in this browser');return;}
   if(micActive){stopMic();return;}
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   micRecognition=new SpeechRecognition();
-  micRecognition.lang='en-US';
-  micRecognition.continuous=false;
-  micRecognition.interimResults=false;
-
-  micRecognition.onstart=()=>{
-    micActive=true;
-    const btn=document.getElementById('mic-btn');
-    if(btn) btn.classList.add('listening');
-    showToast('🎤 Listening...');
-  };
-  micRecognition.onresult=(e)=>{
-    const transcript=e.results[0][0].transcript;
-    const inp=document.getElementById(inputId);
-    if(inp){
-      // for textarea append, for input replace
-      if(inp.tagName==='TEXTAREA') inp.value=(inp.value?inp.value+' ':'')+transcript;
-      else inp.value=transcript;
-    }
-  };
-  micRecognition.onerror=(e)=>{
-    showToast('Mic error: '+e.error);
-    stopMic();
-  };
-  micRecognition.onend=()=>{ stopMic(); };
+  micRecognition.lang='en-US';micRecognition.continuous=false;micRecognition.interimResults=false;
+  micRecognition.onstart=()=>{micActive=true;const btn=document.getElementById('mic-btn');if(btn)btn.classList.add('listening');showToast('🎤 Listening...');};
+  micRecognition.onresult=(e)=>{const transcript=e.results[0][0].transcript;const inp=document.getElementById(inputId);if(inp){if(inp.tagName==='TEXTAREA')inp.value=(inp.value?inp.value+' ':'')+transcript;else inp.value=transcript;}};
+  micRecognition.onerror=(e)=>{showToast('Mic error: '+e.error);stopMic();};
+  micRecognition.onend=()=>{stopMic();};
   micRecognition.start();
 }
-
-function stopMic(){
-  micActive=false;
-  const btn=document.getElementById('mic-btn');
-  if(btn) btn.classList.remove('listening');
-  if(micRecognition){try{micRecognition.stop();}catch(e){} micRecognition=null;}
-}
+function stopMic(){micActive=false;const btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('listening');if(micRecognition){try{micRecognition.stop();}catch(e){}micRecognition=null;}}
 
 // ── TOAST ─────────────────────────────────────────
 function showToast(msg){
