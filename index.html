@@ -814,35 +814,25 @@ function showSentDetail(id){
   if(!s) return;
   curSentDetailId=id;
   lastScreen=document.querySelector('.screen.active').id;
-  showScreen('s-sent-detail');
 
-  // Spanish sentence
+  // populate fields BEFORE switching screen to avoid null errors
+  // (elements exist in DOM even when screen is display:none)
+  const hasT=s.translations&&s.translations.length>0;
+
   document.getElementById('sd-es').textContent=s.es;
 
-  // number of translations hint
-  const hasT=s.translations&&s.translations.length>0;
-  document.getElementById('sd-meta').textContent=hasT
-    ?s.translations.length+' translation'+(s.translations.length>1?'s':'')+' available'
-    :'No translations yet';
-
-  // translations — each one as a detail-section block
-  const tEl=document.getElementById('sd-translations');
-  if(hasT){
-    tEl.innerHTML=s.translations.map((t,i)=>`
+  document.getElementById('sd-translations').innerHTML=hasT
+    ?s.translations.map((t,i)=>`
       <div class="detail-section">
         <div class="detail-sec-label">${s.translations.length>1?'Translation '+(i+1):'Translation'}</div>
         <div class="detail-sec-text">${t}</div>
-      </div>`).join('');
-  } else {
-    tEl.innerHTML='<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet — add them in Google Sheet (columns en1, en2, en3...)</div></div>';
-  }
+      </div>`).join('')
+    :'<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet — add them in Google Sheet (en1, en2, en3...)</div></div>';
 
-  // last practiced
   const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
   document.getElementById('sd-lastprac').textContent=
     daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
 
-  // status buttons
   document.getElementById('sd-status').innerHTML=`
     <button class="status-btn status-learning ${s.status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
     <button class="status-btn status-learned ${s.status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
