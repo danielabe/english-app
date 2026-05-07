@@ -444,36 +444,23 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <button class="btn-danger" onclick="deleteWord()">Delete word</button><div style="height:62px;"></div>
 </div>
 
-<!-- SENTENCE DETAIL (new full screen) -->
+<!-- SENTENCE DETAIL -->
 <div id="s-sent-detail" class="screen">
-  <!-- hero with the Spanish sentence -->
-  <div class="sent-detail-hero">
-    <div class="orb" style="width:120px;height:120px;top:-40px;right:-30px;background:rgba(193,105,214,.10);"></div>
-    <button class="hdr-pill" style="margin-bottom:20px;display:inline-block;" onclick="goBack()">← Back</button>
-    <div class="sent-detail-es" id="sd-es"></div>
-    <div class="sent-detail-meta" id="sd-meta"></div>
+  <div class="hdr" style="padding-bottom:28px;">
+    <button class="hdr-pill" onclick="goBack()">← Back</button>
   </div>
-
-  <!-- translations -->
-  <div style="padding:20px 16px 0;">
-    <div class="sec-label" style="padding:0;margin:0 0 10px;">English translation(s)</div>
-    <div id="sd-translations"></div>
+  <div class="detail-hdr">
+    <div class="detail-word" id="sd-es" style="font-size:22px;line-height:1.4;"></div>
   </div>
-
+  <!-- translations — each one gets its own detail-section block, rendered by JS -->
+  <div id="sd-translations"></div>
   <!-- last practiced -->
-  <div class="detail-section" style="margin-top:16px;">
-    <div class="detail-sec-label">Last practiced</div>
-    <div class="detail-sec-text" id="sd-lastprac">Never</div>
+  <div style="display:flex;gap:10px;padding:0 16px 10px;">
+    <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Last practiced</div><div class="detail-sec-text" id="sd-lastprac">—</div></div>
   </div>
-
-  <!-- status -->
-  <div class="detail-section">
-    <div class="detail-sec-label">Status</div>
-    <div class="status-row" id="sd-status"></div>
-  </div>
-
+  <div class="detail-section" style="margin:0 16px 10px;"><div class="detail-sec-label">Status</div><div class="status-row" id="sd-status"></div></div>
   <button class="btn-danger" onclick="deleteSentenceFromDetail()">Delete sentence</button>
-  <div style="height:80px;"></div>
+  <div style="height:62px;"></div>
 </div>
 
 <!-- PRACTICE -->
@@ -837,16 +824,16 @@ function showSentDetail(id){
     ?s.translations.length+' translation'+(s.translations.length>1?'s':'')+' available'
     :'No translations yet';
 
-  // translations
+  // translations — each one as a detail-section block
   const tEl=document.getElementById('sd-translations');
   if(hasT){
     tEl.innerHTML=s.translations.map((t,i)=>`
-      <div class="trans-card">
-        ${s.translations.length>1?`<div class="trans-card-num">Option ${i+1}</div>`:''}
-        <div class="trans-card-text">${t}</div>
+      <div class="detail-section">
+        <div class="detail-sec-label">${s.translations.length>1?'Translation '+(i+1):'Translation'}</div>
+        <div class="detail-sec-text">${t}</div>
       </div>`).join('');
   } else {
-    tEl.innerHTML='<div class="trans-empty">No translations yet. Add them in Google Sheet (columns en1, en2, en3...).</div>';
+    tEl.innerHTML='<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet — add them in Google Sheet (columns en1, en2, en3...)</div></div>';
   }
 
   // last practiced
