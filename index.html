@@ -814,6 +814,7 @@ function showSentDetail(id){
   if(!s) return;
   curSentDetailId=id;
   lastScreen=document.querySelector('.screen.active').id;
+  showScreen('s-sent-detail');
 
   // Spanish sentence
   document.getElementById('sd-es').textContent=s.es;
