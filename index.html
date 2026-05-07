@@ -244,17 +244,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sitem-meta{font-size:11px;color:var(--tx3);margin-top:6px;}
 
 
-/* SENTENCE DETAIL MODAL */
-.sent-modal{position:fixed;inset:0;background:rgba(21,13,14,.8);z-index:400;display:flex;align-items:flex-end;justify-content:center;}
-.sent-modal-box{background:var(--surface);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:430px;animation:slideup .3s ease;border-top:1px solid var(--border2);max-height:90vh;overflow-y:auto;}
-.sent-modal-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:8px;}
-.sent-modal-es{font-size:18px;color:var(--mist);line-height:1.6;margin-bottom:20px;font-family:'Playfair Display',serif;}
-.sent-modal-divider{height:1px;background:var(--border);margin:16px 0;}
-.sent-modal-en{font-size:15px;color:var(--tx1);line-height:1.7;margin-bottom:10px;padding:12px 14px;background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);}
-.sent-modal-en-empty{font-size:14px;color:var(--tx3);font-style:italic;padding:12px 0;}
-.sent-modal-close{width:100%;padding:13px;background:transparent;color:var(--tx2);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;margin-top:8px;}
-.sent-modal-close:active{background:var(--surface2);}
-.sent-modal-lastprac{font-size:11px;color:var(--tx3);margin-bottom:16px;}
+
 
 /* MIC BUTTON */
 .mic-wrap{position:relative;margin-bottom:12px;}
@@ -274,6 +264,11 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sitem:active{border-color:var(--pink);}
 .sitem-has-translation::after{content:'›';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:18px;}
 .sitem{position:relative;}
+
+
+/* SENTENCE TRANSLATION ITEM */
+.sent-trans-item{font-size:15px;color:var(--tx1);line-height:1.7;padding:12px 14px;background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);margin-bottom:8px;}
+.sent-trans-empty{font-size:14px;color:var(--tx3);font-style:italic;}
 
 /* SENT CARD */
 .sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
@@ -556,17 +551,23 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
 </div>
 
-<!-- SENTENCE DETAIL MODAL -->
-<div id="sent-modal" class="sent-modal" style="display:none;" onclick="closeSentModal(event)">
-  <div class="sent-modal-box">
-    <div class="sent-modal-label">Spanish</div>
-    <div class="sent-modal-es" id="sent-modal-es"></div>
-    <div class="sent-modal-lastprac" id="sent-modal-meta"></div>
-    <div class="sent-modal-divider"></div>
-    <div class="sent-modal-label">English translation(s)</div>
-    <div id="sent-modal-translations"></div>
-    <button class="sent-modal-close" onclick="document.getElementById('sent-modal').style.display='none'">Close</button>
+<!-- SENTENCE DETAIL SCREEN -->
+<div id="s-sent-detail" class="screen">
+  <div class="hdr" style="padding-bottom:28px;">
+    <button class="hdr-pill" onclick="goBack()">← Back</button>
   </div>
+  <div class="detail-hdr">
+    <div class="detail-word" id="sd-es" style="font-size:20px;line-height:1.5;"></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-sec-label">Last practiced</div>
+    <div class="detail-sec-text" id="sd-lastprac">Never</div>
+  </div>
+  <div class="detail-section" id="sd-trans-wrap">
+    <div class="detail-sec-label">English translation(s)</div>
+    <div id="sd-translations"></div>
+  </div>
+  <div style="height:96px;"></div>
 </div>
 
 <!-- SYNC MODAL -->
@@ -728,7 +729,7 @@ function sampleSentences(){return[
 // ── SCREENS ───────────────────────────────────────
 function showScreen(id){
   const isPrac=id==='s-practice'||id==='s-result';
-  const isOverlay=id==='s-add'||id==='s-detail';
+  const isOverlay=id==='s-add'||id==='s-detail'||id==='s-sent-detail';
   document.getElementById('main-nav').style.display=isPrac?'none':'flex';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1162,20 +1163,21 @@ function importJSON(e){
 
 // ── SENTENCE MODAL ────────────────────────────────
 function openSentModal(idx){
-  const s=window.sentList&&window.sentList[idx];if(!s){console.log('no sentence at idx',idx,'list',window.sentList);return;}
-  document.getElementById('sent-modal-es').textContent=s.es;
+  const s=window.sentList&&window.sentList[idx];
+  if(!s) return;
+  // populate detail screen
+  document.getElementById('sd-es').textContent=s.es;
   const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-  document.getElementById('sent-modal-meta').textContent=
-    daysAgo===null?'Never practiced':(daysAgo===0?'Practiced today':(daysAgo===1?'Practiced yesterday':`Practiced ${daysAgo} days ago`));
-  const tEl=document.getElementById('sent-modal-translations');
+  document.getElementById('sd-lastprac').textContent=
+    daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
+  const tEl=document.getElementById('sd-translations');
   if(s.translations&&s.translations.length){
-    tEl.innerHTML=s.translations.map(t=>`<div class="sent-modal-en">${t}</div>`).join('');
+    tEl.innerHTML=s.translations.map(t=>'<div class="sent-trans-item">'+t+'</div>').join('');
   } else {
-    tEl.innerHTML='<div class="sent-modal-en-empty">No translations added yet. Add them in your Google Sheet (columns en1, en2, en3).</div>';
+    tEl.innerHTML='<div class="sent-trans-empty">No translations yet — add them in Google Sheet (columns en1, en2, en3).</div>';
   }
-  document.getElementById('sent-modal').style.display='flex';
+  showScreen('s-sent-detail');
 }
-function closeSentModal(e){if(e.target===document.getElementById('sent-modal'))document.getElementById('sent-modal').style.display='none';}
 
 
 // ── MICROPHONE (Web Speech API) ───────────────────
