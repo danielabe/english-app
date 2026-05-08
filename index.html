@@ -766,7 +766,7 @@ function wHTML(w){
         ${countLabel}
       </div>
       <div style="margin-top:9px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">
-        <div style="height:100%;width:${pct}%;background:var(--pink);border-radius:2px;transition:width .4s ease;"></div>
+        <div style="height:100%;width:${pct}%;background:rgba(193,105,214,0.9);border-radius:2px;transition:width .4s ease;box-shadow:0 0 6px rgba(193,105,214,0.6);"></div>
       </div>
     </div>
     <span class="wchev" style="margin-top:2px;">›</span>
@@ -883,7 +883,10 @@ async function setSentStatus(status){
   if(!s) return;
   s.status=status;
   await saveAndSync();
-  showSentDetail(curSentDetailId); // re-render detail
+  // update buttons in place without touching lastScreen
+  document.getElementById('sd-status').innerHTML=`
+    <button class="status-btn status-learning ${status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
   showToast(status==='learned'?'✓ Marked as learned':'Moved to to learn');
 }
 
@@ -918,7 +921,11 @@ function showDetail(id){
 }
 async function setStatus(s){
   const w=words.find(x=>x.id===curDetailId);if(!w)return;
-  w.status=s;await saveAndSync();showDetail(curDetailId);
+  w.status=s;await saveAndSync();
+  // update buttons in place without touching lastScreen
+  document.getElementById('d-status').innerHTML=`
+    <button class="status-btn status-learning ${s==='learning'?'active-s':''}" onclick="setStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${s==='learned'?'active-s':''}" onclick="setStatus('learned')">Learned ✓</button>`;
   showToast(s==='learned'?'✓ Marked as learned':'Moved to to learn');
 }
 function deleteWord(){
