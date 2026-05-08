@@ -332,11 +332,13 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- VOCAB -->
 <div id="s-vocab" class="screen">
   <div class="hdr">
+    <div class="orb" style="width:100px;height:100px;top:-40px;right:-20px;background:rgba(193,105,214,.12);"></div>
+    <div class="orb" style="width:50px;height:50px;bottom:10px;left:10px;background:rgba(143,83,191,.10);"></div>
     <div class="hdr-top">
       <span class="app-name">Vocabulary</span>
-      <button class="hdr-pill" onclick="showScreen('s-add')">+ Add</button>
+      <button class="hdr-pill" onclick="goToAddWord()">+ Add</button>
     </div>
-    <div class="hdr-sub">Your words and sentences</div>
+    <div class="hdr-sub">Your words &nbsp;·&nbsp; <span id="vocab-count-pill">0 words</span></div>
   </div>
   <div style="height:32px;"></div>
   <div class="tabs">
@@ -368,6 +370,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- ADD -->
 <div id="s-add" class="screen">
   <div class="hdr">
+    <div class="orb" style="width:80px;height:80px;top:-30px;right:30px;background:rgba(193,105,214,.12);"></div>
     <div class="hdr-top">
       <button class="hdr-pill" onclick="goBack()">← Back</button>
       <span class="app-name" style="font-size:20px;">Add</span>
@@ -376,7 +379,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div style="height:28px;"></div>
   <div class="tabs" id="add-tabs">
-    <button class="tab on" onclick="setAddTab('manual',this)">Manual</button>
+    <button class="tab on" onclick="setAddTab('manual',this)">Word</button>
     <button class="tab" onclick="setAddTab('import',this)">Import</button>
     <button class="tab" onclick="setAddTab('sentences',this)">Sentences</button>
   </div>
@@ -427,6 +430,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- DETAIL (word) -->
 <div id="s-detail" class="screen">
   <div class="hdr" style="padding-bottom:28px;">
+    <div class="orb" style="width:80px;height:80px;top:-30px;right:-10px;background:rgba(193,105,214,.10);"></div>
     <button class="hdr-pill" onclick="goBack()">← Back</button>
   </div>
   <div class="detail-hdr">
@@ -447,6 +451,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- SENTENCE DETAIL -->
 <div id="s-sent-detail" class="screen">
   <div class="hdr" style="padding-bottom:28px;">
+    <div class="orb" style="width:80px;height:80px;top:-30px;right:-10px;background:rgba(193,105,214,.10);"></div>
     <button class="hdr-pill" onclick="goBack()">← Back</button>
   </div>
   <div class="detail-hdr">
@@ -492,6 +497,8 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 <!-- SETTINGS -->
 <div id="s-settings" class="screen">
   <div class="hdr">
+    <div class="orb" style="width:100px;height:100px;top:-40px;right:-20px;background:rgba(193,105,214,.12);"></div>
+    <div class="orb" style="width:50px;height:50px;bottom:10px;left:10px;background:rgba(143,83,191,.10);"></div>
     <div class="hdr-top"><span class="app-name">Settings</span></div>
     <div class="hdr-sub">Configuration and sync</div>
   </div>
@@ -540,9 +547,9 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="orb" style="width:100px;height:100px;top:-40px;right:-20px;background:rgba(193,105,214,.12);"></div>
     <div class="hdr-top">
       <span class="app-name">Sentences</span>
-      <span id="sent-count-pill" class="hdr-pill">0 sentences</span>
+      <button class="hdr-pill" onclick="goToAddSentences()">+ Add</button>
     </div>
-    <div class="hdr-sub">Your Spanish sentences to translate</div>
+    <div class="hdr-sub">Your Spanish sentences to translate &nbsp;·&nbsp; <span id="sent-count-pill">0 sentences</span></div>
   </div>
   <div style="height:24px;"></div>
   <div id="sentences-list" class="wlist" style="padding-bottom:96px;"></div>
@@ -779,6 +786,8 @@ function renderHomeRecent(){
 }
 function renderVocab(){
   const el=document.getElementById('vocab-list');
+  const pill=document.getElementById('vocab-count-pill');
+  if(pill) pill.textContent=words.length+' word'+(words.length!==1?'s':'');
   let list=words.filter(w=>w.status===vocabTab);
   if(typeFilter!=='all') list=list.filter(w=>w.type===typeFilter);
   if(levelFilter!=='all') list=list.filter(w=>w.level===levelFilter);
@@ -936,6 +945,25 @@ function deleteWord(){
 // ── ADD / IMPORT ──────────────────────────────────
 function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function selLevel(el,l){selWordLevel=l;document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function goToAddWord(){
+  lastScreen='s-vocab';
+  showScreen('s-add');
+  const tabs=document.querySelectorAll('#add-tabs .tab');
+  tabs.forEach(b=>b.classList.remove('on'));
+  tabs[0].classList.add('on'); // 1st tab = Word
+  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('add-manual').style.display='flex';
+}
+function goToAddSentences(){
+  lastScreen='s-sentences';
+  showScreen('s-add');
+  // activate the Sentences tab in Add screen
+  const tabs=document.querySelectorAll('#add-tabs .tab');
+  tabs.forEach(b=>b.classList.remove('on'));
+  tabs[2].classList.add('on'); // 3rd tab = Sentences
+  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('add-sentences').style.display='block';
+}
 function setAddTab(tab,btn){
   ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('add-'+tab).style.display=tab==='manual'?'flex':'block';
