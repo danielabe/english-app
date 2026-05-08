@@ -690,11 +690,11 @@ function saveLocal(){lsJ(WK,words);lsJ(SK,sentences);}
 async function saveAndSync(){saveLocal();if(sheetURL) await syncToSheet();}
 
 function sampleWords(){return[
-  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',level:'B2',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning',lastPracticed:null},
-  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',level:'B1',example:'Would the Earth survive without the moon?',status:'learning',lastPracticed:null},
-  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',level:'A2',example:'There is a central heating system that can access the GPS in your phone.',status:'learning',lastPracticed:null},
-  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',level:'B1',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning',lastPracticed:null},
-  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null},
+  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',level:'B2',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning',lastPracticed:null,practiceCount:0},
+  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',level:'B1',example:'Would the Earth survive without the moon?',status:'learning',lastPracticed:null,practiceCount:0},
+  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',level:'A2',example:'There is a central heating system that can access the GPS in your phone.',status:'learning',lastPracticed:null,practiceCount:0},
+  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',level:'B1',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning',lastPracticed:null,practiceCount:0},
+  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null,practiceCount:0},
 ];}
 function sampleSentences(){return[
   {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning',lastPracticed:null,translations:['She works at a large company and always arrives on time to meetings.']},
@@ -730,20 +730,46 @@ function updateStats(){
 }
 
 // ── WORD LIST ─────────────────────────────────────
+
+// Progress: 70% from practice count (caps at 10 sessions), 30% from recency (decay over 30 days)
+// Learned words are locked at 100%
+function calcProgress(w){
+  if(w.status==='learned') return 100;
+  const count=w.practiceCount||0;
+  const countScore=Math.min(count/10,1)*70;          // 0-70 pts, maxes at 10 sessions
+  let recencyScore=0;
+  if(w.lastPracticed){
+    const daysAgo=Math.floor((Date.now()-new Date(w.lastPracticed))/86400000);
+    recencyScore=Math.max(0,1-(daysAgo/30))*30;      // 0-30 pts, decays to 0 after 30 days
+  }
+  return Math.min(100,Math.round(countScore+recencyScore));
+}
+
 function wHTML(w){
-  const pct=w.status==='learned'?100:25;
   const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
   const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
   const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
-  return `<div class="witem" onclick="showDetail(${w.id})">
-    <span class="wtype">${w.type}</span>
+  const statusBadge=w.status==='learned'
+    ?'<span style="font-size:10px;color:var(--ok);font-weight:600;">&#10003; learned</span>'
+    :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
+  const pct=calcProgress(w);
+  const count=w.practiceCount||0;
+  const countLabel=`<span style="font-size:10px;color:var(--tx3);">${count} session${count!==1?'s':''}</span>`;
+  return `<div class="witem" onclick="showDetail(${w.id})" style="align-items:flex-start;">
     <div class="winfo">
       <div class="wen">${w.en}${lvlBadge}${practInfo}</div>
       <div class="wes">${w.es||'—'}</div>
       ${w.pron?`<div class="wpron">${w.pron}</div>`:''}
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div style="margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span class="wtype" style="font-size:10px;">${w.type}</span>
+        ${statusBadge}
+        ${countLabel}
+      </div>
+      <div style="margin-top:9px;height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:var(--pink);border-radius:2px;transition:width .4s ease;"></div>
+      </div>
     </div>
-    <span class="wchev">›</span>
+    <span class="wchev" style="margin-top:2px;">›</span>
   </div>`;
 }
 function renderHomeRecent(){
@@ -759,6 +785,18 @@ function renderVocab(){
   el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
+function setTypeFilter(f,el){
+  typeFilter=f;
+  document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderVocab();
+}
+function setLevelFilter(f,el){
+  levelFilter=f;
+  document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderVocab();
+}
 
 // ── SENTENCES LIST ────────────────────────────────
 function renderSentencesList(){
@@ -968,7 +1006,11 @@ function startSameMode(){if(pMode)startMode(pMode);}
 function markWordPracticed(item){
   if(item.en){
     const w=words.find(x=>x.id===item.id);
-    if(w){w.lastPracticed=new Date().toISOString();saveLocal();}
+    if(w){
+      w.lastPracticed=new Date().toISOString();
+      w.practiceCount=(w.practiceCount||0)+1;
+      saveLocal();
+    }
   }
 }
 function renderQ(){
