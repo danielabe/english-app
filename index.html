@@ -18,7 +18,7 @@
   --border:rgba(193,105,214,0.18);--border2:rgba(193,105,214,0.30);
   --tx1:#ede8f5;--tx2:#b89eca;--tx3:#7a6390;
   --ok:#4ade80;--ok2:rgba(74,222,128,0.12);--err:#f87171;--err2:rgba(248,113,113,0.12);
-  --learned:#e040fb;--learned2:rgba(224,64,251,0.13);
+  --learned:#a855f7;--learned2:rgba(168,85,247,0.15);
   --r:16px;--rs:10px;
   --nav-h:64px;
 }
@@ -104,11 +104,12 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   font-weight:700;
   color:var(--learned);
   background:var(--learned2);
-  border:1px solid rgba(224,64,251,0.35);
+  border:1px solid rgba(168,85,247,0.40);
+  box-shadow:0 0 6px rgba(168,85,247,0.22);
   border-radius:6px;
   padding:2px 7px;
   letter-spacing:.03em;
-  box-shadow:0 0 6px rgba(224,64,251,0.25);
+
 }
 
 /* TABS */
@@ -612,8 +613,15 @@ let curDetailId=null, curSentDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorr
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
 const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';};
 
-// ── TODAY KEY ─────────────────────────────────────
-function todayKey(){return new Date().toISOString().slice(0,10);}
+// ── DATE HELPERS — always local time, never UTC ───
+function localDateKey(d){
+  // d is a Date object; returns YYYY-MM-DD in local timezone
+  const dd=d||new Date();
+  return dd.getFullYear()+'-'
+    +String(dd.getMonth()+1).padStart(2,'0')+'-'
+    +String(dd.getDate()).padStart(2,'0');
+}
+function todayKey(){return localDateKey(new Date());}
 
 // ── STREAK — log-based ────────────────────────────
 // practiceLog is a Set of YYYY-MM-DD strings stored as sorted array
@@ -626,18 +634,16 @@ function savePracticeLog(log){
 }
 
 function calcStreak(log){
-  // Count consecutive days ending today (or yesterday if not practiced today yet)
-  const today=todayKey();
+  // Count consecutive days backwards from today using LOCAL dates
   let streak=0;
-  let cursor=new Date();
-  // Start from today; if today not in log, streak still shows 0 until practiced
+  const cursor=new Date();
+  cursor.setHours(12,0,0,0); // noon local — avoids any DST edge
   while(true){
-    const key=cursor.toISOString().slice(0,10);
+    const key=localDateKey(cursor);
     if(log.has(key)){
       streak++;
-      cursor=new Date(cursor.getTime()-86400000);
+      cursor.setDate(cursor.getDate()-1);
     } else {
-      // If the first check (today) fails, streak=0
       break;
     }
   }
