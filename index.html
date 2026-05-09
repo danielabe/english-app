@@ -13,11 +13,12 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --pink:#c169d6;--deep:#40175d;--deeper:#64248d;--mid:#8f53bf;--soft:#855197;
-  --mist:#ded8ea;--ink:#150d0e;
+  --mist:#ede8f5;--ink:#150d0e;
   --bg:#1a0929;--surface:#2a1140;--surface2:#341550;
   --border:rgba(193,105,214,0.18);--border2:rgba(193,105,214,0.30);
   --tx1:#ede8f5;--tx2:#b89eca;--tx3:#7a6390;
   --ok:#4ade80;--ok2:rgba(74,222,128,0.12);--err:#f87171;--err2:rgba(248,113,113,0.12);
+  --learned:#e040fb;--learned2:rgba(224,64,251,0.13);
   --r:16px;--rs:10px;
   --nav-h:64px;
 }
@@ -96,6 +97,19 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .wchev{color:var(--tx3);font-size:18px;flex-shrink:0;}
 .prog-bar{height:2px;background:var(--surface2);border-radius:2px;margin-top:5px;overflow:hidden;}
 .prog-fill{height:100%;background:var(--pink);border-radius:2px;}
+
+/* ── LEARNED BADGE — neon pink/violet ───────────────────────── */
+.badge-learned{
+  font-size:10px;
+  font-weight:700;
+  color:var(--learned);
+  background:var(--learned2);
+  border:1px solid rgba(224,64,251,0.35);
+  border-radius:6px;
+  padding:2px 7px;
+  letter-spacing:.03em;
+  box-shadow:0 0 6px rgba(224,64,251,0.25);
+}
 
 /* TABS */
 .tabs{display:flex;gap:6px;padding:0 16px;margin-bottom:14px;}
@@ -197,7 +211,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .status-row{display:flex;gap:8px;}
 .status-btn{flex:1;padding:10px;border-radius:var(--rs);border:1.5px solid;font-size:13px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .status-learning{border-color:var(--border2);color:var(--tx2);background:transparent;}
-.status-learned{border-color:rgba(74,222,128,.4);color:var(--ok);background:transparent;}
+.status-learned{border-color:rgba(224,64,251,.4);color:var(--learned);background:transparent;}
 .status-btn.active-s{background:var(--deeper);color:var(--pink);border-color:var(--border2);}
 .btn-danger{width:calc(100% - 32px);margin:8px 16px;padding:13px;background:transparent;color:var(--err);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;}
 
@@ -246,11 +260,9 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sent-detail-hero{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 32px;position:relative;overflow:hidden;}
 .sent-detail-es{font-family:'Playfair Display',serif;font-size:22px;color:var(--mist);line-height:1.45;position:relative;z-index:1;}
 .sent-detail-meta{font-size:12px;color:var(--tx2);margin-top:10px;font-weight:300;position:relative;z-index:1;}
-
 .trans-card{background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);padding:14px 16px;margin-bottom:8px;}
 .trans-card-text{font-size:14px;color:var(--tx1);line-height:1.65;}
 .trans-card-num{font-size:10px;font-weight:700;color:var(--pink);letter-spacing:.06em;margin-bottom:4px;text-transform:uppercase;}
-
 .trans-empty{font-size:13px;color:var(--tx3);font-style:italic;padding:10px 0;}
 
 /* EMPTY */
@@ -385,7 +397,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div id="add-manual" class="form-wrap">
     <div><div class="f-label">English word *</div><input class="f-inp" id="f-en" placeholder="e.g.: abandoned"/></div>
-    <div><div class="f-label">Translation</div><input class="f-inp" id="f-es" placeholder="e.g.: abandoned"/></div>
+    <div><div class="f-label">Translation</div><input class="f-inp" id="f-es" placeholder="e.g.: abandonado"/></div>
     <div><div class="f-label">Pronunciation</div><input class="f-inp" id="f-pron" placeholder="e.g.: /əˈbændənd/"/></div>
     <div>
       <div class="f-label">Type</div>
@@ -457,9 +469,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div class="detail-hdr">
     <div class="detail-word" id="sd-es" style="font-size:22px;line-height:1.4;"></div>
   </div>
-  <!-- translations — each one gets its own detail-section block, rendered by JS -->
   <div id="sd-translations"></div>
-  <!-- last practiced -->
   <div style="display:flex;gap:10px;padding:0 16px 10px;">
     <div class="detail-section" style="flex:1;margin:0;"><div class="detail-sec-label">Last practiced</div><div class="detail-sec-text" id="sd-lastprac">—</div></div>
   </div>
@@ -588,39 +598,72 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <span class="nav-lbl">Sentences</span><span class="nav-dot"></span>
   </button>
   <button class="nav-btn" id="nav-settings" onclick="showScreen('s-settings')">
-    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span class="nav-lbl">Settings</span><span class="nav-dot"></span>
   </button>
 </nav>
 
 <script>
-const WK='lingo_words',SK='lingo_sentences',SHEETK='lingo_sheet_url',STREAKK='lingo_streak';
-let words=[],sentences=[],sheetURL='',lastScreen='s-home';
-let vocabTab='learning',typeFilter='all',levelFilter='all',selWordType='adj',selWordLevel='';
-let curDetailId=null,curSentDetailId=null,pMode=null,pQueue=[],pIdx=0,pCorrect=0;
+const WK='lingo_words', SK='lingo_sentences', SHEETK='lingo_sheet_url', LOGK='lingo_practice_log';
+let words=[], sentences=[], sheetURL='', lastScreen='s-home';
+let vocabTab='learning', typeFilter='all', levelFilter='all', selWordType='adj', selWordLevel='';
+let curDetailId=null, curSentDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorrect=0;
 
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
 const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';};
 
-// ── STREAK ────────────────────────────────────────
-function loadStreak(){
-  const d=lsJ(STREAKK)||{count:0,lastDate:''};
-  updateStreakPill(d.count);
+// ── TODAY KEY ─────────────────────────────────────
+function todayKey(){return new Date().toISOString().slice(0,10);}
+
+// ── STREAK — log-based ────────────────────────────
+// practiceLog is a Set of YYYY-MM-DD strings stored as sorted array
+function loadPracticeLog(){
+  const raw=lsJ(LOGK);
+  return new Set(Array.isArray(raw)?raw:[]);
 }
+function savePracticeLog(log){
+  lsJ(LOGK,[...log].sort());
+}
+
+function calcStreak(log){
+  // Count consecutive days ending today (or yesterday if not practiced today yet)
+  const today=todayKey();
+  let streak=0;
+  let cursor=new Date();
+  // Start from today; if today not in log, streak still shows 0 until practiced
+  while(true){
+    const key=cursor.toISOString().slice(0,10);
+    if(log.has(key)){
+      streak++;
+      cursor=new Date(cursor.getTime()-86400000);
+    } else {
+      // If the first check (today) fails, streak=0
+      break;
+    }
+  }
+  return streak;
+}
+
 function updateStreakPill(n){
   document.getElementById('streak-pill').textContent=`🔥 ${n} day${n!==1?'s':''}`;
 }
+
 function markPracticeToday(){
-  const d=lsJ(STREAKK)||{count:0,lastDate:''};
-  const today=new Date().toISOString().slice(0,10);
-  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  if(d.lastDate===today) return;
-  if(d.lastDate===yesterday) d.count++;
-  else d.count=1;
-  d.lastDate=today;
-  lsJ(STREAKK,d);
-  updateStreakPill(d.count);
-  if(sheetURL) sheetPost({action:'saveStreak',streak:d});
+  const log=loadPracticeLog();
+  const today=todayKey();
+  if(log.has(today)) return; // already logged today
+  log.add(today);
+  savePracticeLog(log);
+  const streak=calcStreak(log);
+  updateStreakPill(streak);
+  // sync log to sheet
+  if(sheetURL) sheetPost({action:'savePracticeLog',practiceLog:[...log].sort()});
+}
+
+function loadStreak(){
+  const log=loadPracticeLog();
+  const streak=calcStreak(log);
+  updateStreakPill(streak);
 }
 
 // ── SYNC STATUS ───────────────────────────────────
@@ -674,7 +717,13 @@ async function syncFromSheet(silent){
   if(data&&data.ok){
     if(data.words&&data.words.length){words=data.words;lsJ(WK,words);}
     if(data.sentences&&data.sentences.length){sentences=data.sentences;lsJ(SK,sentences);}
-    if(data.streak){lsJ(STREAKK,data.streak);updateStreakPill(data.streak.count||0);}
+    // merge remote practice log with local
+    if(data.practiceLog&&Array.isArray(data.practiceLog)){
+      const local=loadPracticeLog();
+      data.practiceLog.forEach(d=>local.add(d));
+      savePracticeLog(local);
+      updateStreakPill(calcStreak(local));
+    }
     setSyncStatus('ok','Synced with Sheet ✓');
     updateStats();renderHomeRecent();renderVocab();
     if(!silent) showToast('✓ Data loaded from Sheet');
@@ -687,8 +736,8 @@ async function syncFromSheet(silent){
 async function syncToSheet(){
   if(!sheetURL){showToast('Primero conectá tu Google Sheet en Settings');return;}
   setSyncStatus('syncing','Saving to Sheet...');
-  const streak=lsJ(STREAKK)||{count:0,lastDate:''};
-  const res=await sheetPost({action:'saveAll',words,sentences,streak});
+  const practiceLog=[...loadPracticeLog()].sort();
+  const res=await sheetPost({action:'saveAll',words,sentences,practiceLog});
   if(res&&res.ok){setSyncStatus('ok','Saved to Sheet ✓');showToast('✓ All data saved to Google Sheet');}
   else{setSyncStatus('err','Error saving');showToast('Error saving to Sheet');}
 }
@@ -737,17 +786,14 @@ function updateStats(){
 }
 
 // ── WORD LIST ─────────────────────────────────────
-
-// Progress: 70% from practice count (caps at 10 sessions), 30% from recency (decay over 30 days)
-// Learned words are locked at 100%
 function calcProgress(w){
   if(w.status==='learned') return 100;
   const count=w.practiceCount||0;
-  const countScore=Math.min(count/10,1)*70;          // 0-70 pts, maxes at 10 sessions
+  const countScore=Math.min(count/10,1)*70;
   let recencyScore=0;
   if(w.lastPracticed){
     const daysAgo=Math.floor((Date.now()-new Date(w.lastPracticed))/86400000);
-    recencyScore=Math.max(0,1-(daysAgo/30))*30;      // 0-30 pts, decays to 0 after 30 days
+    recencyScore=Math.max(0,1-(daysAgo/30))*30;
   }
   return Math.min(100,Math.round(countScore+recencyScore));
 }
@@ -756,8 +802,9 @@ function wHTML(w){
   const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
   const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
   const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
+  // ── learned badge: neon pink/violet ──────────────
   const statusBadge=w.status==='learned'
-    ?'<span style="font-size:10px;color:var(--ok);font-weight:600;">&#10003; learned</span>'
+    ?'<span class="badge-learned">✦ learned</span>'
     :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
   const pct=calcProgress(w);
   const count=w.practiceCount||0;
@@ -779,11 +826,13 @@ function wHTML(w){
     <span class="wchev" style="margin-top:2px;">›</span>
   </div>`;
 }
+
 function renderHomeRecent(){
   const el=document.getElementById('home-recent');
   const r=[...words].reverse().slice(0,4);
   el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Add your first words</div></div>`;
 }
+
 function renderVocab(){
   const el=document.getElementById('vocab-list');
   const pill=document.getElementById('vocab-count-pill');
@@ -793,52 +842,35 @@ function renderVocab(){
   if(levelFilter!=='all') list=list.filter(w=>w.level===levelFilter);
   el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
+
 function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
-function setTypeFilter(f,el){
-  typeFilter=f;
-  document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderVocab();
-}
-function setLevelFilter(f,el){
-  levelFilter=f;
-  document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderVocab();
-}
+function setTypeFilter(f,el){typeFilter=f;document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
+function setLevelFilter(f,el){levelFilter=f;document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
 
 // ── SENTENCES LIST ────────────────────────────────
 function renderSentencesList(){
   const el=document.getElementById('sentences-list');
   if(!el) return;
-
-  // update pill count
   const pill=document.getElementById('sent-count-pill');
   if(pill) pill.textContent=sentences.length+' sentence'+(sentences.length!==1?'s':'');
-
   if(!sentences.length){
     el.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">No sentences yet — add some!</div></div>`;
     return;
   }
-
-  // sort: never practiced first, then oldest
   const sorted=[...sentences].sort((a,b)=>{
     if(!a.lastPracticed&&!b.lastPracticed) return 0;
     if(!a.lastPracticed) return -1;
     if(!b.lastPracticed) return 1;
     return new Date(a.lastPracticed)-new Date(b.lastPracticed);
   });
-
   el.innerHTML=sorted.map((s,i)=>{
     const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
     const practInfo=daysAgo===null
       ?'<span style="font-size:11px;color:var(--tx3);">Never practiced</span>'
-      :(daysAgo===0
-        ?'<span style="font-size:11px;color:var(--ok);">Practiced today</span>'
-        :`<span style="font-size:11px;color:var(--tx3);">${daysAgo}d ago</span>`);
+      :(daysAgo===0?'<span style="font-size:11px;color:var(--ok);">Practiced today</span>':`<span style="font-size:11px;color:var(--tx3);">${daysAgo}d ago</span>`);
     const hasT=s.translations&&s.translations.length>0;
     const statusDot=s.status==='learned'
-      ?'<span style="font-size:10px;color:var(--ok);font-weight:600;">✓ learned</span>'
+      ?'<span class="badge-learned">✦ learned</span>'
       :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
     return `<div class="witem" style="align-items:flex-start;gap:10px;" onclick="showSentDetail(${s.id})">
       <span class="wtype" style="margin-top:2px;">${i+1}</span>
@@ -857,54 +889,31 @@ function renderSentencesList(){
 
 // ── SENTENCE DETAIL ───────────────────────────────
 function showSentDetail(id){
-  const s=sentences.find(x=>x.id===id);
-  if(!s) return;
-  curSentDetailId=id;
-  lastScreen=document.querySelector('.screen.active').id;
-
-  // populate fields BEFORE switching screen to avoid null errors
-  // (elements exist in DOM even when screen is display:none)
+  const s=sentences.find(x=>x.id===id);if(!s)return;
+  curSentDetailId=id;lastScreen=document.querySelector('.screen.active').id;
   const hasT=s.translations&&s.translations.length>0;
-
   document.getElementById('sd-es').textContent=s.es;
-
   document.getElementById('sd-translations').innerHTML=hasT
-    ?s.translations.map((t,i)=>`
-      <div class="detail-section">
-        <div class="detail-sec-label">${s.translations.length>1?'Translation '+(i+1):'Translation'}</div>
-        <div class="detail-sec-text">${t}</div>
-      </div>`).join('')
-    :'<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet — add them in Google Sheet (en1, en2, en3...)</div></div>';
-
+    ?s.translations.map((t,i)=>`<div class="detail-section"><div class="detail-sec-label">${s.translations.length>1?'Translation '+(i+1):'Translation'}</div><div class="detail-sec-text">${t}</div></div>`).join('')
+    :'<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet</div></div>';
   const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-  document.getElementById('sd-lastprac').textContent=
-    daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
-
+  document.getElementById('sd-lastprac').textContent=daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
   document.getElementById('sd-status').innerHTML=`
     <button class="status-btn status-learning ${s.status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
     <button class="status-btn status-learned ${s.status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
-
   showScreen('s-sent-detail');
 }
-
 async function setSentStatus(status){
-  const s=sentences.find(x=>x.id===curSentDetailId);
-  if(!s) return;
-  s.status=status;
-  await saveAndSync();
-  // update buttons in place without touching lastScreen
+  const s=sentences.find(x=>x.id===curSentDetailId);if(!s)return;
+  s.status=status;await saveAndSync();
   document.getElementById('sd-status').innerHTML=`
     <button class="status-btn status-learning ${status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
     <button class="status-btn status-learned ${status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
   showToast(status==='learned'?'✓ Marked as learned':'Moved to to learn');
 }
-
 function deleteSentenceFromDetail(){
   if(!confirm('Delete this sentence? This cannot be undone.')) return;
-  sentences=sentences.filter(s=>s.id!==curSentDetailId);
-  saveAndSync();
-  goBack();
-  showToast('Sentence deleted');
+  sentences=sentences.filter(s=>s.id!==curSentDetailId);saveAndSync();goBack();showToast('Sentence deleted');
 }
 
 // ── WORD DETAIL ───────────────────────────────────
@@ -931,7 +940,6 @@ function showDetail(id){
 async function setStatus(s){
   const w=words.find(x=>x.id===curDetailId);if(!w)return;
   w.status=s;await saveAndSync();
-  // update buttons in place without touching lastScreen
   document.getElementById('d-status').innerHTML=`
     <button class="status-btn status-learning ${s==='learning'?'active-s':''}" onclick="setStatus('learning')">To learn</button>
     <button class="status-btn status-learned ${s==='learned'?'active-s':''}" onclick="setStatus('learned')">Learned ✓</button>`;
@@ -946,21 +954,16 @@ function deleteWord(){
 function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function selLevel(el,l){selWordLevel=l;document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function goToAddWord(){
-  lastScreen='s-vocab';
-  showScreen('s-add');
+  lastScreen='s-vocab';showScreen('s-add');
   const tabs=document.querySelectorAll('#add-tabs .tab');
-  tabs.forEach(b=>b.classList.remove('on'));
-  tabs[0].classList.add('on'); // 1st tab = Word
+  tabs.forEach(b=>b.classList.remove('on'));tabs[0].classList.add('on');
   ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('add-manual').style.display='flex';
 }
 function goToAddSentences(){
-  lastScreen='s-sentences';
-  showScreen('s-add');
-  // activate the Sentences tab in Add screen
+  lastScreen='s-sentences';showScreen('s-add');
   const tabs=document.querySelectorAll('#add-tabs .tab');
-  tabs.forEach(b=>b.classList.remove('on'));
-  tabs[2].classList.add('on'); // 3rd tab = Sentences
+  tabs.forEach(b=>b.classList.remove('on'));tabs[2].classList.add('on');
   ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('add-sentences').style.display='block';
 }
@@ -975,8 +978,7 @@ async function addManual(){
   await saveAndSync();updateStats();
   ['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));
-  document.getElementById('lp-none').classList.add('on');
-  selWordLevel='';
+  document.getElementById('lp-none').classList.add('on');selWordLevel='';
   showToast('✓ Word saved');
 }
 async function importWords(){
@@ -1032,7 +1034,7 @@ function startMode(mode){
     if(!words.length){showToast('Add words to practice.');return;}
     pQueue=buildSmartQueue(words,10);
   }
-  markPracticeToday();
+  markPracticeToday(); // log today as practiced
   lastScreen='s-home';showScreen('s-practice');renderQ();
 }
 function startSameMode(){if(pMode)startMode(pMode);}
@@ -1041,11 +1043,7 @@ function startSameMode(){if(pMode)startMode(pMode);}
 function markWordPracticed(item){
   if(item.en){
     const w=words.find(x=>x.id===item.id);
-    if(w){
-      w.lastPracticed=new Date().toISOString();
-      w.practiceCount=(w.practiceCount||0)+1;
-      saveLocal();
-    }
+    if(w){w.lastPracticed=new Date().toISOString();w.practiceCount=(w.practiceCount||0)+1;saveLocal();}
   }
 }
 function renderQ(){
@@ -1110,17 +1108,9 @@ function doFlip(){
 }
 async function selfEval(knew){
   document.querySelectorAll('.eval-btn').forEach(b=>b.disabled=true);
-  if(knew){
-    pCorrect++;
-    const item=pQueue[pIdx];
-    if(item&&item.en){
-      const w=words.find(x=>x.id===item.id);
-      if(w&&w.status!=='learned'){w.status='learned';saveLocal();if(sheetURL) syncToSheet();}
-    }
-  }
+  if(knew){pCorrect++;const item=pQueue[pIdx];if(item&&item.en){const w=words.find(x=>x.id===item.id);if(w&&w.status!=='learned'){w.status='learned';saveLocal();if(sheetURL)syncToSheet();}}}
   nextQ();
 }
-
 async function checkWord(){
   const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
   const item=pQueue[pIdx];const ok=ans.toLowerCase()===item.en.toLowerCase();
@@ -1144,11 +1134,7 @@ function checkFill(){
   else showFB(`✗ Era "${item.en}"${item.es?' — '+item.es:''}`,false);
   document.getElementById('btn-check').style.display='none';document.getElementById('btn-next').style.display='block';
 }
-function nextQ(){
-  pIdx++;
-  if(pIdx>=pQueue.length) showResults();
-  else renderQ();
-}
+function nextQ(){pIdx++;if(pIdx>=pQueue.length)showResults();else renderQ();}
 
 function showFB(text,loading){
   const box=document.getElementById('ai-box');box.classList.add('show');
@@ -1165,7 +1151,7 @@ async function getAI(prompt){
 
 function showResults(){
   const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
-  let title='Excellent!', iconSVG, iconBg;
+  let title='Excellent!',iconSVG,iconBg;
   if(pct>=80){title='Excellent!';iconBg='rgba(74,222,128,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
   else if(pct>=50){title='Well done!';iconBg='rgba(193,105,214,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
   else if(pct>=20){title='Keep going!';iconBg='rgba(251,191,36,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';}
@@ -1191,8 +1177,9 @@ async function saveSheetURL(){
   await syncFromSheet(false);
 }
 function exportData(){
+  const practiceLog=[...loadPracticeLog()].sort();
   const a=document.createElement('a');
-  a.href='data:application/json,'+encodeURIComponent(JSON.stringify({words,sentences},null,2));
+  a.href='data:application/json,'+encodeURIComponent(JSON.stringify({words,sentences,practiceLog},null,2));
   a.download='lingo-backup.json';a.click();
 }
 function importJSON(e){
@@ -1203,6 +1190,9 @@ function importJSON(e){
       const d=JSON.parse(ev.target.result);
       if(d.words){words=d.words;lsJ(WK,words);}
       if(d.sentences){sentences=d.sentences;lsJ(SK,sentences);}
+      if(d.practiceLog&&Array.isArray(d.practiceLog)){
+        const log=new Set(d.practiceLog);savePracticeLog(log);updateStreakPill(calcStreak(log));
+      }
       await saveAndSync();updateStats();renderHomeRecent();renderVocab();showToast('✓ Data imported');
     }catch{showToast('Error reading file');}
   };
