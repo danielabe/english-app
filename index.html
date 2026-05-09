@@ -18,7 +18,8 @@
   --border:rgba(193,105,214,0.18);--border2:rgba(193,105,214,0.30);
   --tx1:#ede8f5;--tx2:#b89eca;--tx3:#7a6390;
   --ok:#4ade80;--ok2:rgba(74,222,128,0.12);--err:#f87171;--err2:rgba(248,113,113,0.12);
-  --learned:#a855f7;--learned2:rgba(168,85,247,0.15);
+  /* ── LEARNED: neon pink (was violet) ── */
+  --learned:#f472b6;--learned2:rgba(244,114,182,0.15);
   --r:16px;--rs:10px;
   --nav-h:64px;
 }
@@ -98,18 +99,17 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .prog-bar{height:2px;background:var(--surface2);border-radius:2px;margin-top:5px;overflow:hidden;}
 .prog-fill{height:100%;background:var(--pink);border-radius:2px;}
 
-/* ── LEARNED BADGE — neon pink/violet ───────────────────────── */
+/* ── LEARNED BADGE — neon PINK ── */
 .badge-learned{
   font-size:10px;
   font-weight:700;
   color:var(--learned);
   background:var(--learned2);
-  border:1px solid rgba(168,85,247,0.40);
-  box-shadow:0 0 6px rgba(168,85,247,0.22);
+  border:1px solid rgba(244,114,182,0.45);
+  box-shadow:0 0 7px rgba(244,114,182,0.30);
   border-radius:6px;
   padding:2px 7px;
   letter-spacing:.03em;
-
 }
 
 /* TABS */
@@ -212,7 +212,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .status-row{display:flex;gap:8px;}
 .status-btn{flex:1;padding:10px;border-radius:var(--rs);border:1.5px solid;font-size:13px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .status-learning{border-color:var(--border2);color:var(--tx2);background:transparent;}
-.status-learned{border-color:rgba(224,64,251,.4);color:var(--learned);background:transparent;}
+.status-learned{border-color:rgba(244,114,182,.4);color:var(--learned);background:transparent;}
 .status-btn.active-s{background:var(--deeper);color:var(--pink);border-color:var(--border2);}
 .btn-danger{width:calc(100% - 32px);margin:8px 16px;padding:13px;background:transparent;color:var(--err);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;}
 
@@ -615,7 +615,6 @@ const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return lo
 
 // ── DATE HELPERS — always local time, never UTC ───
 function localDateKey(d){
-  // d is a Date object; returns YYYY-MM-DD in local timezone
   const dd=d||new Date();
   return dd.getFullYear()+'-'
     +String(dd.getMonth()+1).padStart(2,'0')+'-'
@@ -623,8 +622,9 @@ function localDateKey(d){
 }
 function todayKey(){return localDateKey(new Date());}
 
-// ── STREAK — log-based ────────────────────────────
-// practiceLog is a Set of YYYY-MM-DD strings stored as sorted array
+// ── PRACTICE LOG ──────────────────────────────────
+// Stored in localStorage as a sorted array of YYYY-MM-DD strings.
+// The sheet stores the same list and MERGES (never overwrites) on the server side.
 function loadPracticeLog(){
   const raw=lsJ(LOGK);
   return new Set(Array.isArray(raw)?raw:[]);
@@ -634,10 +634,10 @@ function savePracticeLog(log){
 }
 
 function calcStreak(log){
-  // Count consecutive days backwards from today using LOCAL dates
+  // Count consecutive days backwards from today (local time)
   let streak=0;
   const cursor=new Date();
-  cursor.setHours(12,0,0,0); // noon local — avoids any DST edge
+  cursor.setHours(12,0,0,0); // noon local — avoids DST edge cases
   while(true){
     const key=localDateKey(cursor);
     if(log.has(key)){
@@ -654,22 +654,28 @@ function updateStreakPill(n){
   document.getElementById('streak-pill').textContent=`🔥 ${n} day${n!==1?'s':''}`;
 }
 
+// ── markPracticeToday ─────────────────────────────
+// Called at the START of any practice session.
+// Adds today to the local log and pushes ONLY today's date to the sheet
+// (the sheet-side merges it with existing dates — no data loss).
 function markPracticeToday(){
   const log=loadPracticeLog();
   const today=todayKey();
-  if(log.has(today)) return; // already logged today
+  if(log.has(today)){
+    // Already logged today locally — still update streak display in case
+    updateStreakPill(calcStreak(log));
+    return;
+  }
   log.add(today);
   savePracticeLog(log);
-  const streak=calcStreak(log);
-  updateStreakPill(streak);
-  // sync log to sheet
-  if(sheetURL) sheetPost({action:'savePracticeLog',practiceLog:[...log].sort()});
+  updateStreakPill(calcStreak(log));
+  // Push the full local log so the sheet can merge correctly
+  if(sheetURL) sheetPost({action:'mergePracticeLog', practiceLog:[...log].sort()});
 }
 
 function loadStreak(){
   const log=loadPracticeLog();
-  const streak=calcStreak(log);
-  updateStreakPill(streak);
+  updateStreakPill(calcStreak(log));
 }
 
 // ── SYNC STATUS ───────────────────────────────────
@@ -723,12 +729,17 @@ async function syncFromSheet(silent){
   if(data&&data.ok){
     if(data.words&&data.words.length){words=data.words;lsJ(WK,words);}
     if(data.sentences&&data.sentences.length){sentences=data.sentences;lsJ(SK,sentences);}
-    // merge remote practice log with local
+    // Merge remote practice log WITH local — whichever has more days wins
     if(data.practiceLog&&Array.isArray(data.practiceLog)){
       const local=loadPracticeLog();
+      const before=local.size;
       data.practiceLog.forEach(d=>local.add(d));
       savePracticeLog(local);
       updateStreakPill(calcStreak(local));
+      // If we gained new dates from the sheet, push the merged result back
+      if(local.size>before&&sheetURL){
+        sheetPost({action:'mergePracticeLog',practiceLog:[...local].sort()});
+      }
     }
     setSyncStatus('ok','Synced with Sheet ✓');
     updateStats();renderHomeRecent();renderVocab();
@@ -808,7 +819,7 @@ function wHTML(w){
   const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
   const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
   const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
-  // ── learned badge: neon pink/violet ──────────────
+  // ── learned badge: neon PINK ──
   const statusBadge=w.status==='learned'
     ?'<span class="badge-learned">✦ learned</span>'
     :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
@@ -1040,7 +1051,8 @@ function startMode(mode){
     if(!words.length){showToast('Add words to practice.');return;}
     pQueue=buildSmartQueue(words,10);
   }
-  markPracticeToday(); // log today as practiced
+  // Mark today as practiced — accumulates in localStorage + syncs to sheet (merge)
+  markPracticeToday();
   lastScreen='s-home';showScreen('s-practice');renderQ();
 }
 function startSameMode(){if(pMode)startMode(pMode);}
