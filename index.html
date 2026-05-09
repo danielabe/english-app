@@ -18,7 +18,6 @@
   --border:rgba(193,105,214,0.18);--border2:rgba(193,105,214,0.30);
   --tx1:#ede8f5;--tx2:#b89eca;--tx3:#7a6390;
   --ok:#4ade80;--ok2:rgba(74,222,128,0.12);--err:#f87171;--err2:rgba(248,113,113,0.12);
-  /* ── LEARNED: neon pink (was violet) ── */
   --learned:#f472b6;--learned2:rgba(244,114,182,0.15);
   --r:16px;--rs:10px;
   --nav-h:64px;
@@ -31,7 +30,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .screen.active{display:block;animation:rise .22s ease;}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* HEADER */
 .hdr{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 40px;position:relative;overflow:hidden;}
 .orb{position:absolute;border-radius:50%;pointer-events:none;}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;margin-bottom:6px;}
@@ -41,7 +39,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .hdr-pill{background:rgba(193,105,214,0.2);color:var(--mist);font-size:12px;font-weight:500;padding:5px 13px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;}
 .hdr-pill:active{background:rgba(193,105,214,0.35);}
 
-/* SYNC STATUS BAR */
 .sync-status{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;color:var(--tx3);}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0;}
 .sync-dot.ok{background:var(--ok);}
@@ -50,16 +47,13 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .sync-btn-small{margin-left:auto;font-size:11px;color:var(--pink);cursor:pointer;font-family:'Outfit',sans-serif;background:none;border:none;padding:2px 8px;}
 
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:36px 16px 12px;}
 .stat{background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);padding:14px 10px 12px;text-align:center;}
 .stat-n{font-size:26px;font-weight:600;color:var(--pink);line-height:1;}
 .stat-l{font-size:11px;color:var(--tx3);margin-top:4px;}
 
-/* SECTION LABEL */
 .sec-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);padding:0 16px;margin:20px 0 10px;}
 
-/* PRACTICE GRID */
 .prac-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px;}
 .prac-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:18px 16px;cursor:pointer;transition:transform .13s,background .13s;}
 .prac-card:active{transform:scale(.96);background:var(--surface2);}
@@ -68,7 +62,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .prac-title{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:4px;}
 .prac-desc{font-size:11px;color:var(--tx3);line-height:1.5;}
 
-/* LEVEL BADGE */
 .lvl-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;letter-spacing:.04em;vertical-align:middle;margin-left:6px;}
 .lvl-A1{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3);}
 .lvl-A2{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.3);}
@@ -86,7 +79,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .level-pill.on.lp-C1{background:rgba(193,105,214,.25);color:#c169d6;}
 .level-pill.on.lp-C2{background:rgba(244,114,182,.2);color:#f472b6;}
 
-/* WORD LIST */
 .wlist{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
 .witem{background:var(--surface);border-radius:var(--rs);border:1px solid var(--border);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;}
 .witem:active{border-color:var(--pink);}
@@ -96,34 +88,17 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .wes{font-size:12px;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .wpron{font-size:10px;color:var(--soft);margin-top:2px;}
 .wchev{color:var(--tx3);font-size:18px;flex-shrink:0;}
-.prog-bar{height:2px;background:var(--surface2);border-radius:2px;margin-top:5px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--pink);border-radius:2px;}
+.badge-learned{font-size:10px;font-weight:700;color:var(--learned);background:var(--learned2);border:1px solid rgba(244,114,182,0.45);box-shadow:0 0 7px rgba(244,114,182,0.30);border-radius:6px;padding:2px 7px;letter-spacing:.03em;}
 
-/* ── LEARNED BADGE — neon PINK ── */
-.badge-learned{
-  font-size:10px;
-  font-weight:700;
-  color:var(--learned);
-  background:var(--learned2);
-  border:1px solid rgba(244,114,182,0.45);
-  box-shadow:0 0 7px rgba(244,114,182,0.30);
-  border-radius:6px;
-  padding:2px 7px;
-  letter-spacing:.03em;
-}
-
-/* TABS */
 .tabs{display:flex;gap:6px;padding:0 16px;margin-bottom:14px;}
 .tab{flex:1;padding:9px 6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;color:var(--tx3);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;}
 .tab.on{background:var(--deeper);color:var(--pink);border-color:var(--border2);font-weight:500;}
 
-/* CHIPS */
 .chips{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none;}
 .chips::-webkit-scrollbar{display:none;}
 .chip{padding:5px 13px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--surface);color:var(--tx3);cursor:pointer;white-space:nowrap;font-family:'Outfit',sans-serif;transition:all .15s;flex-shrink:0;}
 .chip.on{background:rgba(193,105,214,.2);color:var(--pink);border-color:var(--border2);}
 
-/* BOTTOM NAV */
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:200;height:var(--nav-h);padding-bottom:env(safe-area-inset-bottom);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;transition:background .15s;padding:8px 4px;}
 .nav-btn:active{background:rgba(193,105,214,.1);}
@@ -134,7 +109,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .nav-dot{width:4px;height:4px;border-radius:50%;background:var(--pink);display:none;}
 .nav-btn.on .nav-dot{display:block;}
 
-/* PRACTICE */
 .prac-hdr{background:var(--surface);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .back-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
 .back-btn svg{width:18px;height:18px;stroke:var(--tx2);fill:none;stroke-width:2;stroke-linecap:round;}
@@ -161,7 +135,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .btn-out{width:100%;padding:13px;background:transparent;color:var(--tx2);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s;display:none;}
 .btn-out:active{background:var(--surface2);}
 
-/* FLIP */
 .flip-wrap{perspective:1000px;margin-bottom:20px;cursor:pointer;}
 .flip-card{width:100%;min-height:160px;position:relative;transform-style:preserve-3d;transition:transform .45s;border-radius:var(--r);}
 .flip-card.flipped{transform:rotateY(180deg);}
@@ -177,7 +150,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .eval-forgot{border-color:var(--err);color:var(--err);background:transparent;}
 .eval-forgot:active{background:var(--err2);}
 
-/* AI BOX */
 .ai-box{background:var(--surface2);border-radius:var(--rs);border:1px solid var(--border2);padding:14px 16px;margin-bottom:12px;display:none;}
 .ai-box.show{display:block;animation:rise .25s ease;}
 .ai-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--pink);margin-bottom:6px;}
@@ -187,7 +159,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .dot:nth-child(2){animation-delay:.18s}.dot:nth-child(3){animation-delay:.36s}
 @keyframes bob{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
 
-/* FORMS */
 .form-wrap{padding:0 16px;display:flex;flex-direction:column;gap:12px;}
 .f-label{font-size:11px;font-weight:600;color:var(--tx3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;}
 .f-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-family:'Outfit',sans-serif;color:var(--tx1);background:var(--surface);outline:none;}
@@ -201,7 +172,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .import-hint code{font-size:11px;color:var(--pink);background:rgba(193,105,214,.15);padding:1px 5px;border-radius:4px;}
 .import-result{font-size:13px;color:var(--pink);text-align:center;margin-top:10px;font-weight:500;}
 
-/* DETAIL */
 .detail-hdr{text-align:center;padding:30px 20px 20px;}
 .detail-word{font-family:'Playfair Display',serif;font-size:34px;color:var(--mist);}
 .detail-pron{font-size:14px;color:var(--soft);margin:4px 0 10px;}
@@ -216,7 +186,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .status-btn.active-s{background:var(--deeper);color:var(--pink);border-color:var(--border2);}
 .btn-danger{width:calc(100% - 32px);margin:8px 16px;padding:13px;background:transparent;color:var(--err);border:1px solid rgba(248,113,113,.3);border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;}
 
-/* RESULT */
 .result-wrap{padding:60px 24px 40px;text-align:center;}
 .result-icon{width:80px;height:80px;border-radius:50%;background:rgba(193,105,214,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;border:1px solid var(--border2);}
 .result-icon svg{width:36px;height:36px;stroke:var(--pink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -225,8 +194,11 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .result-nums{display:flex;justify-content:center;gap:40px;margin-bottom:36px;}
 .result-num{font-size:32px;font-weight:600;color:var(--pink);line-height:1;}
 .result-numlabel{font-size:12px;color:var(--tx3);margin-top:4px;}
+/* streak highlight in result screen */
+.result-streak{background:rgba(193,105,214,.15);border:1px solid var(--border2);border-radius:var(--rs);padding:14px 20px;margin-bottom:28px;display:inline-block;}
+.result-streak-n{font-size:28px;font-weight:600;color:var(--pink);line-height:1;}
+.result-streak-l{font-size:12px;color:var(--tx3);margin-top:4px;}
 
-/* SETTINGS */
 .settings-section{padding:0 16px;margin-bottom:20px;}
 .settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
 .settings-row{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;}
@@ -239,7 +211,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .settings-row-sub{font-size:12px;color:var(--tx3);margin-top:1px;}
 .settings-row-arrow{color:var(--tx3);}
 
-/* SYNC MODAL */
 .sync-modal{position:fixed;inset:0;background:rgba(21,13,14,.75);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
 .sync-modal-box{background:var(--surface);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:430px;animation:slideup .3s ease;border-top:1px solid var(--border2);}
 @keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -252,27 +223,22 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sync-url-inp:focus{border-color:var(--pink);}
 .sync-url-inp::placeholder{color:var(--tx3);}
 
-/* SENT CARD */
 .sent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
 .sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
 .sent-hint{font-size:11px;color:var(--tx3);margin-top:6px;}
 
-/* SENTENCE DETAIL */
 .sent-detail-hero{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 32px;position:relative;overflow:hidden;}
 .sent-detail-es{font-family:'Playfair Display',serif;font-size:22px;color:var(--mist);line-height:1.45;position:relative;z-index:1;}
 .sent-detail-meta{font-size:12px;color:var(--tx2);margin-top:10px;font-weight:300;position:relative;z-index:1;}
 .trans-card{background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);padding:14px 16px;margin-bottom:8px;}
 .trans-card-text{font-size:14px;color:var(--tx1);line-height:1.65;}
 .trans-card-num{font-size:10px;font-weight:700;color:var(--pink);letter-spacing:.06em;margin-bottom:4px;text-transform:uppercase;}
-.trans-empty{font-size:13px;color:var(--tx3);font-style:italic;padding:10px 0;}
 
-/* EMPTY */
 .empty{text-align:center;padding:48px 24px;color:var(--tx3);}
 .empty-icon{width:56px;height:56px;border-radius:50%;background:rgba(193,105,214,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
 .empty-icon svg{width:24px;height:24px;stroke:var(--soft);fill:none;stroke-width:1.8;stroke-linecap:round;}
 .empty-text{font-size:14px;}
 
-/* MIC BUTTON */
 .mic-wrap{position:relative;margin-bottom:12px;}
 .mic-wrap .ans-inp{padding-right:52px;margin-bottom:0;}
 .mic-wrap .ans-ta{padding-right:52px;}
@@ -285,7 +251,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .mic-ta-wrap .ans-ta{margin-bottom:0;padding-right:52px;}
 .mic-ta-wrap .mic-btn{top:16px;transform:none;}
 
-/* TOAST */
 .toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);color:var(--tx1);border:1px solid var(--border2);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:500;max-width:90%;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
@@ -496,6 +461,10 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="result-icon" id="r-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div class="result-title" id="r-title">Well done!</div>
     <div class="result-sub" id="r-sub">Session complete</div>
+    <div class="result-streak" id="r-streak-box">
+      <div class="result-streak-n" id="r-streak">🔥 0 days</div>
+      <div class="result-streak-l">current streak</div>
+    </div>
     <div class="result-nums">
       <div><div class="result-num" id="r-correct">—</div><div class="result-numlabel">Correct</div></div>
       <div><div class="result-num" id="r-total">—</div><div class="result-numlabel">Total</div></div>
@@ -613,7 +582,8 @@ let curDetailId=null, curSentDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorr
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
 const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';};
 
-// ── DATE HELPERS — always local time, never UTC ───
+// ── DATE HELPERS ──────────────────────────────────
+// Always use LOCAL time — never UTC — to avoid midnight timezone bugs.
 function localDateKey(d){
   const dd=d||new Date();
   return dd.getFullYear()+'-'
@@ -624,17 +594,20 @@ function todayKey(){return localDateKey(new Date());}
 
 // ── PRACTICE LOG ──────────────────────────────────
 // Stored in localStorage as a sorted array of YYYY-MM-DD strings.
-// The sheet stores the same list and MERGES (never overwrites) on the server side.
+// The sheet stores the same list and MERGES (never overwrites) server-side.
 function loadPracticeLog(){
   const raw=lsJ(LOGK);
   return new Set(Array.isArray(raw)?raw:[]);
 }
 function savePracticeLog(log){
-  lsJ(LOGK,[...log].sort());
+  // Always persist as a sorted deduplicated array
+  const sorted=[...log].filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+  lsJ(LOGK,sorted);
+  return sorted;
 }
 
 function calcStreak(log){
-  // Count consecutive days backwards from today (local time)
+  // Walk backwards from today counting consecutive days that are in the log
   let streak=0;
   const cursor=new Date();
   cursor.setHours(12,0,0,0); // noon local — avoids DST edge cases
@@ -651,26 +624,33 @@ function calcStreak(log){
 }
 
 function updateStreakPill(n){
-  document.getElementById('streak-pill').textContent=`🔥 ${n} day${n!==1?'s':''}`;
+  const label=`🔥 ${n} day${n!==1?'s':''}`;
+  document.getElementById('streak-pill').textContent=label;
 }
 
 // ── markPracticeToday ─────────────────────────────
-// Called at the START of any practice session.
-// Adds today to the local log and pushes ONLY today's date to the sheet
-// (the sheet-side merges it with existing dates — no data loss).
+// Called ONLY when a practice session is COMPLETED (in showResults).
+// Adds today to the local log (if not already there), recalculates streak,
+// and pushes the FULL accumulated log to the sheet so it can merge correctly.
+// The sheet-side mergePracticeLog never deletes existing dates — it only adds.
 function markPracticeToday(){
   const log=loadPracticeLog();
   const today=todayKey();
-  if(log.has(today)){
-    // Already logged today locally — still update streak display in case
-    updateStreakPill(calcStreak(log));
-    return;
-  }
+  const alreadyLogged=log.has(today);
+
   log.add(today);
-  savePracticeLog(log);
-  updateStreakPill(calcStreak(log));
-  // Push the full local log so the sheet can merge correctly
-  if(sheetURL) sheetPost({action:'mergePracticeLog', practiceLog:[...log].sort()});
+  const sorted=savePracticeLog(log);
+  const streak=calcStreak(log);
+  updateStreakPill(streak);
+
+  // Always push the full sorted log so the sheet can merge any missing dates.
+  // The sheet function uses a Set union — sending duplicates is harmless.
+  if(sheetURL){
+    sheetPost({action:'mergePracticeLog', practiceLog:sorted})
+      .catch(()=>{}); // fire-and-forget — don't block the UI
+  }
+
+  return streak;
 }
 
 function loadStreak(){
@@ -729,18 +709,26 @@ async function syncFromSheet(silent){
   if(data&&data.ok){
     if(data.words&&data.words.length){words=data.words;lsJ(WK,words);}
     if(data.sentences&&data.sentences.length){sentences=data.sentences;lsJ(SK,sentences);}
-    // Merge remote practice log WITH local — whichever has more days wins
+
+    // Merge remote practice log INTO local — union, never replace.
+    // This means whichever side has more days, all of them are kept.
     if(data.practiceLog&&Array.isArray(data.practiceLog)){
       const local=loadPracticeLog();
-      const before=local.size;
-      data.practiceLog.forEach(d=>local.add(d));
+      const sizeBefore=local.size;
+      data.practiceLog.forEach(d=>{
+        if(d&&/^\d{4}-\d{2}-\d{2}$/.test(String(d).trim()))
+          local.add(String(d).trim());
+      });
       savePracticeLog(local);
-      updateStreakPill(calcStreak(local));
+      const streak=calcStreak(local);
+      updateStreakPill(streak);
       // If we gained new dates from the sheet, push the merged result back
-      if(local.size>before&&sheetURL){
+      // so both sides stay in sync (idempotent merge).
+      if(local.size>sizeBefore&&sheetURL){
         sheetPost({action:'mergePracticeLog',practiceLog:[...local].sort()});
       }
     }
+
     setSyncStatus('ok','Synced with Sheet ✓');
     updateStats();renderHomeRecent();renderVocab();
     if(!silent) showToast('✓ Data loaded from Sheet');
@@ -819,7 +807,6 @@ function wHTML(w){
   const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
   const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
   const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
-  // ── learned badge: neon PINK ──
   const statusBadge=w.status==='learned'
     ?'<span class="badge-learned">✦ learned</span>'
     :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
@@ -1051,8 +1038,9 @@ function startMode(mode){
     if(!words.length){showToast('Add words to practice.');return;}
     pQueue=buildSmartQueue(words,10);
   }
-  // Mark today as practiced — accumulates in localStorage + syncs to sheet (merge)
-  markPracticeToday();
+  // NOTE: we do NOT call markPracticeToday() here.
+  // The day is only logged when the session is COMPLETED (showResults).
+  // This prevents partial sessions from counting toward the streak.
   lastScreen='s-home';showScreen('s-practice');renderQ();
 }
 function startSameMode(){if(pMode)startMode(pMode);}
@@ -1167,7 +1155,14 @@ async function getAI(prompt){
   }catch{document.getElementById('ai-txt').textContent='Could not connect to AI.';}
 }
 
+// ── RESULTS & STREAK RECORDING ────────────────────
+// markPracticeToday() is called HERE — only when the full session completes.
+// This means:
+//   - Closing mid-session does NOT count as a practice day.
+//   - All 4 practice modes reach this function.
+//   - The local log accumulates across days; the sheet merges without overwriting.
 function showResults(){
+  const streak=markPracticeToday(); // ← record the day NOW, get updated streak back
   const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
   let title='Excellent!',iconSVG,iconBg;
   if(pct>=80){title='Excellent!';iconBg='rgba(74,222,128,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
@@ -1178,6 +1173,7 @@ function showResults(){
   document.getElementById('r-icon').innerHTML=iconSVG;
   document.getElementById('r-title').textContent=title;
   document.getElementById('r-sub').textContent=`${pct}% correct`;
+  document.getElementById('r-streak').textContent=`🔥 ${streak} day${streak!==1?'s':''}`;
   document.getElementById('r-correct').textContent=pCorrect;
   document.getElementById('r-total').textContent=pQueue.length;
   showScreen('s-result');
@@ -1209,7 +1205,11 @@ function importJSON(e){
       if(d.words){words=d.words;lsJ(WK,words);}
       if(d.sentences){sentences=d.sentences;lsJ(SK,sentences);}
       if(d.practiceLog&&Array.isArray(d.practiceLog)){
-        const log=new Set(d.practiceLog);savePracticeLog(log);updateStreakPill(calcStreak(log));
+        // Merge imported log with existing local log — never replace
+        const existing=loadPracticeLog();
+        d.practiceLog.forEach(dt=>existing.add(dt));
+        savePracticeLog(existing);
+        updateStreakPill(calcStreak(existing));
       }
       await saveAndSync();updateStats();renderHomeRecent();renderVocab();showToast('✓ Data imported');
     }catch{showToast('Error reading file');}
