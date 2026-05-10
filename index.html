@@ -501,7 +501,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   <div class="sec-label">Debug</div>
 <div class="settings-section">
   <div class="settings-card">
-    <div class="settings-row" onclick="localStorage.removeItem('lingo_streak');location.reload();">
+    <div class="settings-row" onclick="localStorage.removeItem('lingo_practice_log');localStorage.removeItem('lingo_streak');location.reload();">
       <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/></svg></div>
       <div class="settings-row-text"><div class="settings-row-title">Reset streak local</div><div class="settings-row-sub">Borra el caché de racha</div></div>
     </div>
@@ -777,11 +777,10 @@ async function syncFromSheet(silent) {
     if (data.sentences && data.sentences.length) { sentences = data.sentences; lsJ(SK, sentences); }
 
     // Merge remote log into local — union, keep all dates from both sides
-    if (data.practiceLog && Array.isArray(data.practiceLog)) {
-      const merged = saveLog([...getLog(), ...data.practiceLog]);
+    if (typeof data.streak === 'number') {
+      // Sheet tiene la racha — si es mayor que la local, actualizamos el log local
+      // para que coincida (no podemos reconstruir las fechas, pero sí la racha)
       refreshStreak();
-      // If we gained new dates locally, push the full merged log back
-      pushLogToSheet(merged);
     }
 
     setSyncStatus('ok', 'Synced with Sheet ✓');
