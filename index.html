@@ -505,6 +505,14 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
       <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10"/></svg></div>
       <div class="settings-row-text"><div class="settings-row-title">Reset streak local</div><div class="settings-row-sub">Borra el caché de racha</div></div>
     </div>
+    <div class="settings-row" onclick="testConnection()">
+      <div class="settings-row-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="settings-row-text"><div class="settings-row-title">Test conexión</div><div class="settings-row-sub" id="test-result">Tap para probar</div></div>
+    </div>
+    <div class="settings-row" onclick="testRecord()">
+      <div class="settings-row-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="settings-row-text"><div class="settings-row-title">Test grabar fecha hoy</div><div class="settings-row-sub" id="record-result">Tap para probar</div></div>
+    </div>
   </div>
 </div>
   <div class="sec-label">Local backup</div>
