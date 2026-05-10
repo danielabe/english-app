@@ -194,7 +194,6 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .result-nums{display:flex;justify-content:center;gap:40px;margin-bottom:36px;}
 .result-num{font-size:32px;font-weight:600;color:var(--pink);line-height:1;}
 .result-numlabel{font-size:12px;color:var(--tx3);margin-top:4px;}
-/* streak highlight in result screen */
 .result-streak{background:rgba(193,105,214,.15);border:1px solid var(--border2);border-radius:var(--rs);padding:14px 20px;margin-bottom:28px;display:inline-block;}
 .result-streak-n{font-size:28px;font-weight:600;color:var(--pink);line-height:1;}
 .result-streak-l{font-size:12px;color:var(--tx3);margin-top:4px;}
@@ -227,12 +226,10 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 .sent-es{font-size:15px;color:var(--tx1);line-height:1.7;}
 .sent-hint{font-size:11px;color:var(--tx3);margin-top:6px;}
 
-.sent-detail-hero{background:linear-gradient(160deg,var(--deeper) 0%,var(--deep) 100%);padding:52px 22px 32px;position:relative;overflow:hidden;}
-.sent-detail-es{font-family:'Playfair Display',serif;font-size:22px;color:var(--mist);line-height:1.45;position:relative;z-index:1;}
-.sent-detail-meta{font-size:12px;color:var(--tx2);margin-top:10px;font-weight:300;position:relative;z-index:1;}
-.trans-card{background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--pink);padding:14px 16px;margin-bottom:8px;}
-.trans-card-text{font-size:14px;color:var(--tx1);line-height:1.65;}
-.trans-card-num{font-size:10px;font-weight:700;color:var(--pink);letter-spacing:.06em;margin-bottom:4px;text-transform:uppercase;}
+.detail-hdr{text-align:center;padding:30px 20px 20px;}
+.detail-word{font-family:'Playfair Display',serif;font-size:34px;color:var(--mist);}
+.detail-pron{font-size:14px;color:var(--soft);margin:4px 0 10px;}
+.detail-type{display:inline-block;background:rgba(193,105,214,.15);color:var(--pink);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);}
 
 .empty{text-align:center;padding:48px 24px;color:var(--tx3);}
 .empty-icon{width:56px;height:56px;border-radius:50%;background:rgba(193,105,214,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
@@ -574,7 +571,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 </nav>
 
 <script>
-const WK='lingo_words', SK='lingo_sentences', SHEETK='lingo_sheet_url', LOGK='lingo_practice_log';
+const WK='lingo_words', SK='lingo_sentences', SHEETK='lingo_sheet_url';
 let words=[], sentences=[], sheetURL='', lastScreen='s-home';
 let vocabTab='learning', typeFilter='all', levelFilter='all', selWordType='adj', selWordLevel='';
 let curDetailId=null, curSentDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorrect=0;
@@ -582,242 +579,255 @@ let curDetailId=null, curSentDetailId=null, pMode=null, pQueue=[], pIdx=0, pCorr
 const lsJ=(k,v)=>{if(v!==undefined){localStorage.setItem(k,JSON.stringify(v));return v;}try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}};
 const ls=(k,v)=>{if(v!==undefined){localStorage.setItem(k,v);return v;}return localStorage.getItem(k)||'';};
 
-// ── DATE HELPERS ──────────────────────────────────
-// Always use LOCAL time — never UTC — to avoid midnight timezone bugs.
-function localDateKey(d){
-  const dd=d||new Date();
-  return dd.getFullYear()+'-'
-    +String(dd.getMonth()+1).padStart(2,'0')+'-'
-    +String(dd.getDate()).padStart(2,'0');
-}
-function todayKey(){return localDateKey(new Date());}
+// ══════════════════════════════════════════════════
+//  STREAK — source of truth is the Sheet column "Racha"
+//  Local is only a display cache to avoid blank on startup.
+// ══════════════════════════════════════════════════
 
-// ── PRACTICE LOG ──────────────────────────────────
-// Stored in localStorage as a sorted array of YYYY-MM-DD strings.
-// The sheet stores the same list and MERGES (never overwrites) server-side.
-function loadPracticeLog(){
-  const raw=lsJ(LOGK);
-  return new Set(Array.isArray(raw)?raw:[]);
-}
-function savePracticeLog(log){
-  // Always persist as a sorted deduplicated array
-  const sorted=[...log].filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
-  lsJ(LOGK,sorted);
-  return sorted;
+// Returns today's date as "YYYY-MM-DD" in LOCAL time (never UTC).
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+    + String(d.getDate()).padStart(2, '0');
 }
 
-function calcStreak(log){
-  // Walk backwards from today counting consecutive days that are in the log
-  let streak=0;
-  const cursor=new Date();
-  cursor.setHours(12,0,0,0); // noon local — avoids DST edge cases
-  while(true){
-    const key=localDateKey(cursor);
-    if(log.has(key)){
+// Given a sorted array of "YYYY-MM-DD" strings, count consecutive
+// days ending on today. Gaps of any size reset the streak to 0.
+function calcStreak(dates) {
+  if (!dates || !dates.length) return 0;
+
+  // Deduplicate and sort descending so we walk backwards easily
+  const set = new Set(dates);
+  const sorted = [...set].sort().reverse(); // newest first
+
+  const today = todayKey();
+  let streak = 0;
+  const cursor = new Date(); // local midnight anchor
+  cursor.setHours(12, 0, 0, 0); // use noon to dodge DST
+
+  for (let i = 0; i < 10000; i++) { // safety cap
+    const key = cursor.getFullYear() + '-'
+      + String(cursor.getMonth() + 1).padStart(2, '0') + '-'
+      + String(cursor.getDate()).padStart(2, '0');
+    if (set.has(key)) {
       streak++;
-      cursor.setDate(cursor.getDate()-1);
+      cursor.setDate(cursor.getDate() - 1);
     } else {
-      break;
+      break; // gap found — streak is over
     }
   }
   return streak;
 }
 
-function updateStreakPill(n){
-  const label=`🔥 ${n} day${n!==1?'s':''}`;
-  document.getElementById('streak-pill').textContent=label;
+function renderStreakPill(n) {
+  document.getElementById('streak-pill').textContent = `🔥 ${n} day${n !== 1 ? 's' : ''}`;
 }
 
 // ── markPracticeToday ─────────────────────────────
-// Called ONLY when a practice session is COMPLETED (in showResults).
-// Adds today to the local log (if not already there), recalculates streak,
-// and pushes the FULL accumulated log to the sheet so it can merge correctly.
-// The sheet-side mergePracticeLog never deletes existing dates — it only adds.
-function markPracticeToday(){
-  const log=loadPracticeLog();
-  const today=todayKey();
-  const alreadyLogged=log.has(today);
+// Called ONLY when a session is FULLY completed (inside showResults).
+// 1. POSTs today's date to the Sheet so it gets stored permanently.
+// 2. After the Sheet confirms, re-fetches the full date list and
+//    recalculates the streak from the Sheet data.
+// 3. Falls back to a local estimate if the Sheet is unreachable.
+async function markPracticeToday() {
+  const today = todayKey();
 
-  log.add(today);
-  const sorted=savePracticeLog(log);
-  const streak=calcStreak(log);
-  updateStreakPill(streak);
+  // Optimistic local update so the pill shows something immediately
+  const localDates = lsJ('lingo_streak_cache') || [];
+  if (!localDates.includes(today)) localDates.push(today);
+  lsJ('lingo_streak_cache', localDates);
+  const optimistic = calcStreak(localDates);
+  renderStreakPill(optimistic);
 
-  // Always push the full sorted log so the sheet can merge any missing dates.
-  // The sheet function uses a Set union — sending duplicates is harmless.
-  if(sheetURL){
-    sheetPost({action:'mergePracticeLog', practiceLog:sorted})
-      .catch(()=>{}); // fire-and-forget — don't block the UI
-  }
+  if (!sheetURL) return optimistic;
 
-  return streak;
+  try {
+    // POST today's date to the Sheet
+    const params = new URLSearchParams();
+    params.append('action', 'addPracticeDate');
+    params.append('data', JSON.stringify({ action: 'addPracticeDate', date: today }));
+    const res = await fetch(sheetURL, { method: 'POST', body: params });
+    const json = JSON.parse(await res.text());
+
+    // The Sheet returns the full, authoritative date list
+    if (json.ok && Array.isArray(json.dates)) {
+      lsJ('lingo_streak_cache', json.dates); // update local cache
+      const streak = calcStreak(json.dates);
+      renderStreakPill(streak);
+      return streak;
+    }
+  } catch (e) { /* network error — use optimistic value */ }
+
+  return optimistic;
 }
 
-function loadStreak(){
-  const log=loadPracticeLog();
-  updateStreakPill(calcStreak(log));
+// ── loadStreak ────────────────────────────────────
+// Called on startup. Reads the Sheet and shows the real streak.
+// If the Sheet is unavailable, falls back to the local cache.
+async function loadStreak() {
+  const cached = lsJ('lingo_streak_cache') || [];
+  renderStreakPill(calcStreak(cached)); // immediate display
+
+  if (!sheetURL) return;
+
+  try {
+    const res = await fetch(sheetURL + '?action=getPracticeDates');
+    const json = JSON.parse(await res.text());
+    if (json.ok && Array.isArray(json.dates)) {
+      lsJ('lingo_streak_cache', json.dates);
+      renderStreakPill(calcStreak(json.dates));
+    }
+  } catch (e) { /* keep cached value */ }
 }
 
 // ── SYNC STATUS ───────────────────────────────────
-function setSyncStatus(state,msg){
-  document.getElementById('sync-dot').className='sync-dot'+(state?' '+state:'');
-  document.getElementById('sync-label').textContent=msg;
+function setSyncStatus(state, msg) {
+  document.getElementById('sync-dot').className = 'sync-dot' + (state ? ' ' + state : '');
+  document.getElementById('sync-label').textContent = msg;
 }
 
 // ── SHEET COMMUNICATION ───────────────────────────
-async function sheetPost(body){
-  if(!sheetURL) return null;
-  try{
-    const params=new URLSearchParams();
-    params.append('action',body.action||'');
-    params.append('data',JSON.stringify(body));
-    const r=await fetch(sheetURL,{method:'POST',body:params});
-    const text=await r.text();
-    try{return JSON.parse(text);}catch{return {ok:true};}
-  }catch(e){return null;}
+async function sheetPost(body) {
+  if (!sheetURL) return null;
+  try {
+    const params = new URLSearchParams();
+    params.append('action', body.action || '');
+    params.append('data', JSON.stringify(body));
+    const r = await fetch(sheetURL, { method: 'POST', body: params });
+    const text = await r.text();
+    try { return JSON.parse(text); } catch { return { ok: true }; }
+  } catch (e) { return null; }
 }
-async function sheetGet(){
-  if(!sheetURL) return null;
-  try{
-    const r=await fetch(sheetURL+'?action=get');
-    const text=await r.text();
-    try{return JSON.parse(text);}catch{return null;}
-  }catch(e){return null;}
+async function sheetGet() {
+  if (!sheetURL) return null;
+  try {
+    const r = await fetch(sheetURL + '?action=get');
+    const text = await r.text();
+    try { return JSON.parse(text); } catch { return null; }
+  } catch (e) { return null; }
 }
 
 // ── LOAD ──────────────────────────────────────────
-async function load(){
-  words=lsJ(WK)||[];
-  sentences=lsJ(SK)||[];
-  sheetURL=ls(SHEETK);
-  loadStreak();
-  if(sheetURL){
-    document.getElementById('sheet-status-label').textContent='Conectado ✓';
+async function load() {
+  words = lsJ(WK) || [];
+  sentences = lsJ(SK) || [];
+  sheetURL = ls(SHEETK);
+
+  if (sheetURL) {
+    document.getElementById('sheet-status-label').textContent = 'Conectado ✓';
     await syncFromSheet(true);
   } else {
-    if(!words.length) words=sampleWords();
-    if(!sentences.length) sentences=sampleSentences();
-    setSyncStatus('','Not connected — ve a Settings');
+    if (!words.length) words = sampleWords();
+    if (!sentences.length) sentences = sampleSentences();
+    setSyncStatus('', 'Not connected — ve a Settings');
   }
-  updateStats();renderHomeRecent();renderVocab();
+
+  await loadStreak(); // always load streak (uses cache if no sheet)
+  updateStats(); renderHomeRecent(); renderVocab();
 }
 
-async function syncFromSheet(silent){
-  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Settings');return;}
-  setSyncStatus('syncing','Loading from Sheet...');
-  const data=await sheetGet();
-  if(data&&data.ok){
-    if(data.words&&data.words.length){words=data.words;lsJ(WK,words);}
-    if(data.sentences&&data.sentences.length){sentences=data.sentences;lsJ(SK,sentences);}
-
-    // Merge remote practice log INTO local — union, never replace.
-    // This means whichever side has more days, all of them are kept.
-    if(data.practiceLog&&Array.isArray(data.practiceLog)){
-      const local=loadPracticeLog();
-      const sizeBefore=local.size;
-      data.practiceLog.forEach(d=>{
-        if(d&&/^\d{4}-\d{2}-\d{2}$/.test(String(d).trim()))
-          local.add(String(d).trim());
-      });
-      savePracticeLog(local);
-      const streak=calcStreak(local);
-      updateStreakPill(streak);
-      // If we gained new dates from the sheet, push the merged result back
-      // so both sides stay in sync (idempotent merge).
-      if(local.size>sizeBefore&&sheetURL){
-        sheetPost({action:'mergePracticeLog',practiceLog:[...local].sort()});
-      }
-    }
-
-    setSyncStatus('ok','Synced with Sheet ✓');
-    updateStats();renderHomeRecent();renderVocab();
-    if(!silent) showToast('✓ Data loaded from Sheet');
+async function syncFromSheet(silent) {
+  if (!sheetURL) { showToast('Primero conectá tu Google Sheet en Settings'); return; }
+  setSyncStatus('syncing', 'Loading from Sheet...');
+  const data = await sheetGet();
+  if (data && data.ok) {
+    if (data.words && data.words.length) { words = data.words; lsJ(WK, words); }
+    if (data.sentences && data.sentences.length) { sentences = data.sentences; lsJ(SK, sentences); }
+    // Streak dates come via a separate endpoint; loadStreak() handles them
+    await loadStreak();
+    setSyncStatus('ok', 'Synced with Sheet ✓');
+    updateStats(); renderHomeRecent(); renderVocab();
+    if (!silent) showToast('✓ Data loaded from Sheet');
   } else {
-    setSyncStatus('err','Error al conectar');
-    if(!silent) showToast('Could not connect to Sheet');
+    setSyncStatus('err', 'Error al conectar');
+    if (!silent) showToast('Could not connect to Sheet');
   }
 }
 
-async function syncToSheet(){
-  if(!sheetURL){showToast('Primero conectá tu Google Sheet en Settings');return;}
-  setSyncStatus('syncing','Saving to Sheet...');
-  const practiceLog=[...loadPracticeLog()].sort();
-  const res=await sheetPost({action:'saveAll',words,sentences,practiceLog});
-  if(res&&res.ok){setSyncStatus('ok','Saved to Sheet ✓');showToast('✓ All data saved to Google Sheet');}
-  else{setSyncStatus('err','Error saving');showToast('Error saving to Sheet');}
+async function syncToSheet() {
+  if (!sheetURL) { showToast('Primero conectá tu Google Sheet en Settings'); return; }
+  setSyncStatus('syncing', 'Saving to Sheet...');
+  const res = await sheetPost({ action: 'saveAll', words, sentences });
+  if (res && res.ok) { setSyncStatus('ok', 'Saved to Sheet ✓'); showToast('✓ All data saved to Google Sheet'); }
+  else { setSyncStatus('err', 'Error saving'); showToast('Error saving to Sheet'); }
 }
 
-function saveLocal(){lsJ(WK,words);lsJ(SK,sentences);}
-async function saveAndSync(){saveLocal();if(sheetURL) await syncToSheet();}
+function saveLocal() { lsJ(WK, words); lsJ(SK, sentences); }
+async function saveAndSync() { saveLocal(); if (sheetURL) await syncToSheet(); }
 
-function sampleWords(){return[
-  {id:1,en:'abandoned',es:'abandonado/a',pron:'/əˈbændənd/',type:'adj',level:'B2',example:'You can usually keep anything which the owner has clearly abandoned.',status:'learning',lastPracticed:null,practiceCount:0},
-  {id:2,en:'absence',es:'ausencia',pron:'/ˈæbsəns/',type:'n',level:'B1',example:'Would the Earth survive without the moon?',status:'learning',lastPracticed:null,practiceCount:0},
-  {id:3,en:'access',es:'acceder',pron:'/ˈækses/',type:'v',level:'A2',example:'There is a central heating system that can access the GPS in your phone.',status:'learning',lastPracticed:null,practiceCount:0},
-  {id:4,en:'accidental',es:'accidental',pron:'/ˌæksɪˈdentl/',type:'adj',level:'B1',example:'People falling asleep behind the wheel may cause accidental crashes.',status:'learning',lastPracticed:null,practiceCount:0},
-  {id:5,en:'accompany',es:'acompañar',pron:'/əˈkʌmpəni/',type:'v',level:'C1',example:'Mary Kingsley could accompany her father on his travels.',status:'learned',lastPracticed:null,practiceCount:0},
-];}
-function sampleSentences(){return[
-  {id:1,es:'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.',status:'learning',lastPracticed:null,translations:['She works at a large company and always arrives on time to meetings.']},
-  {id:2,es:'Normalmente no toma decisiones importantes sin hablar antes con su equipo.',status:'learning',lastPracticed:null,translations:['She usually does not make important decisions without talking to her team first.']},
-  {id:3,es:'A veces le cuesta concentrarse cuando hay mucho ruido.',status:'learning',lastPracticed:null,translations:['Sometimes she finds it hard to concentrate when there is a lot of noise.']},
-  {id:4,es:'Este sistema no funciona correctamente si no se configura bien.',status:'learning',lastPracticed:null,translations:['This system does not work properly if it is not set up correctly.']},
-  {id:5,es:'Casi nunca está de acuerdo con las decisiones que toma la gerencia.',status:'learning',lastPracticed:null,translations:['She almost never agrees with the decisions made by management.']},
-];}
+function sampleWords() {
+  return [
+    { id: 1, en: 'abandoned', es: 'abandonado/a', pron: '/əˈbændənd/', type: 'adj', level: 'B2', example: 'You can usually keep anything which the owner has clearly abandoned.', status: 'learning', lastPracticed: null, practiceCount: 0 },
+    { id: 2, en: 'absence', es: 'ausencia', pron: '/ˈæbsəns/', type: 'n', level: 'B1', example: 'Would the Earth survive without the moon?', status: 'learning', lastPracticed: null, practiceCount: 0 },
+    { id: 3, en: 'access', es: 'acceder', pron: '/ˈækses/', type: 'v', level: 'A2', example: 'There is a central heating system that can access the GPS in your phone.', status: 'learning', lastPracticed: null, practiceCount: 0 },
+    { id: 4, en: 'accidental', es: 'accidental', pron: '/ˌæksɪˈdentl/', type: 'adj', level: 'B1', example: 'People falling asleep behind the wheel may cause accidental crashes.', status: 'learning', lastPracticed: null, practiceCount: 0 },
+    { id: 5, en: 'accompany', es: 'acompañar', pron: '/əˈkʌmpəni/', type: 'v', level: 'C1', example: 'Mary Kingsley could accompany her father on his travels.', status: 'learned', lastPracticed: null, practiceCount: 0 },
+  ];
+}
+function sampleSentences() {
+  return [
+    { id: 1, es: 'Ella trabaja en una empresa grande y siempre llega a tiempo a las reuniones.', status: 'learning', lastPracticed: null, translations: ['She works at a large company and always arrives on time to meetings.'] },
+    { id: 2, es: 'Normalmente no toma decisiones importantes sin hablar antes con su equipo.', status: 'learning', lastPracticed: null, translations: ['She usually does not make important decisions without talking to her team first.'] },
+    { id: 3, es: 'A veces le cuesta concentrarse cuando hay mucho ruido.', status: 'learning', lastPracticed: null, translations: ['Sometimes she finds it hard to concentrate when there is a lot of noise.'] },
+    { id: 4, es: 'Este sistema no funciona correctamente si no se configura bien.', status: 'learning', lastPracticed: null, translations: ['This system does not work properly if it is not set up correctly.'] },
+    { id: 5, es: 'Casi nunca está de acuerdo con las decisiones que toma la gerencia.', status: 'learning', lastPracticed: null, translations: ['She almost never agrees with the decisions made by management.'] },
+  ];
+}
 
 // ── SCREENS ───────────────────────────────────────
-function showScreen(id){
-  const isPrac=id==='s-practice'||id==='s-result';
-  const isOverlay=id==='s-add'||id==='s-detail'||id==='s-sent-detail';
-  document.getElementById('main-nav').style.display=isPrac?'none':'flex';
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+function showScreen(id) {
+  const isPrac = id === 's-practice' || id === 's-result';
+  const isOverlay = id === 's-add' || id === 's-detail' || id === 's-sent-detail';
+  document.getElementById('main-nav').style.display = isPrac ? 'none' : 'flex';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(!isPrac){
-    ['nav-home','nav-vocab','nav-add','nav-sentences','nav-settings'].forEach(n=>document.getElementById(n).classList.remove('on'));
-    const m={'s-home':'nav-home','s-vocab':'nav-vocab','s-add':'nav-add','s-sentences':'nav-sentences','s-settings':'nav-settings'};
-    if(m[id])document.getElementById(m[id]).classList.add('on');
-    if(!isOverlay) lastScreen=id;
+  if (!isPrac) {
+    ['nav-home', 'nav-vocab', 'nav-add', 'nav-sentences', 'nav-settings'].forEach(n => document.getElementById(n).classList.remove('on'));
+    const m = { 's-home': 'nav-home', 's-vocab': 'nav-vocab', 's-add': 'nav-add', 's-sentences': 'nav-sentences', 's-settings': 'nav-settings' };
+    if (m[id]) document.getElementById(m[id]).classList.add('on');
+    if (!isOverlay) lastScreen = id;
   }
-  if(id==='s-vocab')renderVocab();
-  if(id==='s-sentences')renderSentencesList();
-  if(id==='s-home'){updateStats();renderHomeRecent();}
+  if (id === 's-vocab') renderVocab();
+  if (id === 's-sentences') renderSentencesList();
+  if (id === 's-home') { updateStats(); renderHomeRecent(); }
 }
-function goBack(){showScreen(lastScreen);}
+function goBack() { showScreen(lastScreen); }
 
-function updateStats(){
-  document.getElementById('st-total').textContent=words.length;
-  document.getElementById('st-learned').textContent=words.filter(w=>w.status==='learned').length;
-  document.getElementById('st-sentences').textContent=sentences.length;
+function updateStats() {
+  document.getElementById('st-total').textContent = words.length;
+  document.getElementById('st-learned').textContent = words.filter(w => w.status === 'learned').length;
+  document.getElementById('st-sentences').textContent = sentences.length;
 }
 
 // ── WORD LIST ─────────────────────────────────────
-function calcProgress(w){
-  if(w.status==='learned') return 100;
-  const count=w.practiceCount||0;
-  const countScore=Math.min(count/10,1)*70;
-  let recencyScore=0;
-  if(w.lastPracticed){
-    const daysAgo=Math.floor((Date.now()-new Date(w.lastPracticed))/86400000);
-    recencyScore=Math.max(0,1-(daysAgo/30))*30;
+function calcProgress(w) {
+  if (w.status === 'learned') return 100;
+  const count = w.practiceCount || 0;
+  const countScore = Math.min(count / 10, 1) * 70;
+  let recencyScore = 0;
+  if (w.lastPracticed) {
+    const daysAgo = Math.floor((Date.now() - new Date(w.lastPracticed)) / 86400000);
+    recencyScore = Math.max(0, 1 - (daysAgo / 30)) * 30;
   }
-  return Math.min(100,Math.round(countScore+recencyScore));
+  return Math.min(100, Math.round(countScore + recencyScore));
 }
 
-function wHTML(w){
-  const lvlBadge=w.level?`<span class="lvl-badge lvl-${w.level}">${w.level}</span>`:'';
-  const daysAgo=w.lastPracticed?Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24)):null;
-  const practInfo=daysAgo===null?'':(daysAgo===0?'<span style="font-size:10px;color:var(--tx3);"> · today</span>':`<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
-  const statusBadge=w.status==='learned'
-    ?'<span class="badge-learned">✦ learned</span>'
-    :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
-  const pct=calcProgress(w);
-  const count=w.practiceCount||0;
-  const countLabel=`<span style="font-size:10px;color:var(--tx3);">${count} session${count!==1?'s':''}</span>`;
+function wHTML(w) {
+  const lvlBadge = w.level ? `<span class="lvl-badge lvl-${w.level}">${w.level}</span>` : '';
+  const daysAgo = w.lastPracticed ? Math.floor((Date.now() - new Date(w.lastPracticed)) / (1000 * 60 * 60 * 24)) : null;
+  const practInfo = daysAgo === null ? '' : (daysAgo === 0 ? '<span style="font-size:10px;color:var(--tx3);"> · today</span>' : `<span style="font-size:10px;color:var(--tx3);"> · ${daysAgo}d</span>`);
+  const statusBadge = w.status === 'learned'
+    ? '<span class="badge-learned">✦ learned</span>'
+    : '<span style="font-size:10px;color:var(--tx3);">to learn</span>';
+  const pct = calcProgress(w);
+  const count = w.practiceCount || 0;
+  const countLabel = `<span style="font-size:10px;color:var(--tx3);">${count} session${count !== 1 ? 's' : ''}</span>`;
   return `<div class="witem" onclick="showDetail(${w.id})" style="align-items:flex-start;">
     <div class="winfo">
       <div class="wen">${w.en}${lvlBadge}${practInfo}</div>
-      <div class="wes">${w.es||'—'}</div>
-      ${w.pron?`<div class="wpron">${w.pron}</div>`:''}
+      <div class="wes">${w.es || '—'}</div>
+      ${w.pron ? `<div class="wpron">${w.pron}</div>` : ''}
       <div style="margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
         <span class="wtype" style="font-size:10px;">${w.type}</span>
         ${statusBadge}
@@ -831,58 +841,58 @@ function wHTML(w){
   </div>`;
 }
 
-function renderHomeRecent(){
-  const el=document.getElementById('home-recent');
-  const r=[...words].reverse().slice(0,4);
-  el.innerHTML=r.length?r.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Add your first words</div></div>`;
+function renderHomeRecent() {
+  const el = document.getElementById('home-recent');
+  const r = [...words].reverse().slice(0, 4);
+  el.innerHTML = r.length ? r.map(wHTML).join('') : `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="empty-text">Add your first words</div></div>`;
 }
 
-function renderVocab(){
-  const el=document.getElementById('vocab-list');
-  const pill=document.getElementById('vocab-count-pill');
-  if(pill) pill.textContent=words.length+' word'+(words.length!==1?'s':'');
-  let list=words.filter(w=>w.status===vocabTab);
-  if(typeFilter!=='all') list=list.filter(w=>w.type===typeFilter);
-  if(levelFilter!=='all') list=list.filter(w=>w.level===levelFilter);
-  el.innerHTML=list.length?list.map(wHTML).join(''):`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
+function renderVocab() {
+  const el = document.getElementById('vocab-list');
+  const pill = document.getElementById('vocab-count-pill');
+  if (pill) pill.textContent = words.length + ' word' + (words.length !== 1 ? 's' : '');
+  let list = words.filter(w => w.status === vocabTab);
+  if (typeFilter !== 'all') list = list.filter(w => w.type === typeFilter);
+  if (levelFilter !== 'all') list = list.filter(w => w.level === levelFilter);
+  el.innerHTML = list.length ? list.map(wHTML).join('') : `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
 }
 
-function setVocabTab(tab,btn){vocabTab=tab;document.querySelectorAll('#s-vocab .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderVocab();}
-function setTypeFilter(f,el){typeFilter=f;document.querySelectorAll('#chips-type .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
-function setLevelFilter(f,el){levelFilter=f;document.querySelectorAll('#chips-level .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderVocab();}
+function setVocabTab(tab, btn) { vocabTab = tab; document.querySelectorAll('#s-vocab .tab').forEach(b => b.classList.remove('on')); btn.classList.add('on'); renderVocab(); }
+function setTypeFilter(f, el) { typeFilter = f; document.querySelectorAll('#chips-type .chip').forEach(c => c.classList.remove('on')); el.classList.add('on'); renderVocab(); }
+function setLevelFilter(f, el) { levelFilter = f; document.querySelectorAll('#chips-level .chip').forEach(c => c.classList.remove('on')); el.classList.add('on'); renderVocab(); }
 
 // ── SENTENCES LIST ────────────────────────────────
-function renderSentencesList(){
-  const el=document.getElementById('sentences-list');
-  if(!el) return;
-  const pill=document.getElementById('sent-count-pill');
-  if(pill) pill.textContent=sentences.length+' sentence'+(sentences.length!==1?'s':'');
-  if(!sentences.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">No sentences yet — add some!</div></div>`;
+function renderSentencesList() {
+  const el = document.getElementById('sentences-list');
+  if (!el) return;
+  const pill = document.getElementById('sent-count-pill');
+  if (pill) pill.textContent = sentences.length + ' sentence' + (sentences.length !== 1 ? 's' : '');
+  if (!sentences.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">No sentences yet — add some!</div></div>`;
     return;
   }
-  const sorted=[...sentences].sort((a,b)=>{
-    if(!a.lastPracticed&&!b.lastPracticed) return 0;
-    if(!a.lastPracticed) return -1;
-    if(!b.lastPracticed) return 1;
-    return new Date(a.lastPracticed)-new Date(b.lastPracticed);
+  const sorted = [...sentences].sort((a, b) => {
+    if (!a.lastPracticed && !b.lastPracticed) return 0;
+    if (!a.lastPracticed) return -1;
+    if (!b.lastPracticed) return 1;
+    return new Date(a.lastPracticed) - new Date(b.lastPracticed);
   });
-  el.innerHTML=sorted.map((s,i)=>{
-    const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-    const practInfo=daysAgo===null
-      ?'<span style="font-size:11px;color:var(--tx3);">Never practiced</span>'
-      :(daysAgo===0?'<span style="font-size:11px;color:var(--ok);">Practiced today</span>':`<span style="font-size:11px;color:var(--tx3);">${daysAgo}d ago</span>`);
-    const hasT=s.translations&&s.translations.length>0;
-    const statusDot=s.status==='learned'
-      ?'<span class="badge-learned">✦ learned</span>'
-      :'<span style="font-size:10px;color:var(--tx3);">to learn</span>';
+  el.innerHTML = sorted.map((s, i) => {
+    const daysAgo = s.lastPracticed ? Math.floor((Date.now() - new Date(s.lastPracticed)) / 86400000) : null;
+    const practInfo = daysAgo === null
+      ? '<span style="font-size:11px;color:var(--tx3);">Never practiced</span>'
+      : (daysAgo === 0 ? '<span style="font-size:11px;color:var(--ok);">Practiced today</span>' : `<span style="font-size:11px;color:var(--tx3);">${daysAgo}d ago</span>`);
+    const hasT = s.translations && s.translations.length > 0;
+    const statusDot = s.status === 'learned'
+      ? '<span class="badge-learned">✦ learned</span>'
+      : '<span style="font-size:10px;color:var(--tx3);">to learn</span>';
     return `<div class="witem" style="align-items:flex-start;gap:10px;" onclick="showSentDetail(${s.id})">
-      <span class="wtype" style="margin-top:2px;">${i+1}</span>
+      <span class="wtype" style="margin-top:2px;">${i + 1}</span>
       <div class="winfo">
         <div style="font-size:14px;color:var(--tx1);line-height:1.5;">${s.es}</div>
         <div style="margin-top:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${practInfo}
-          ${hasT?'<span style="font-size:10px;color:var(--pink);">'+s.translations.length+' translation'+(s.translations.length>1?'s':'')+'</span>':''}
+          ${hasT ? '<span style="font-size:10px;color:var(--pink);">' + s.translations.length + ' translation' + (s.translations.length > 1 ? 's' : '') + '</span>' : ''}
           ${statusDot}
         </div>
       </div>
@@ -892,193 +902,190 @@ function renderSentencesList(){
 }
 
 // ── SENTENCE DETAIL ───────────────────────────────
-function showSentDetail(id){
-  const s=sentences.find(x=>x.id===id);if(!s)return;
-  curSentDetailId=id;lastScreen=document.querySelector('.screen.active').id;
-  const hasT=s.translations&&s.translations.length>0;
-  document.getElementById('sd-es').textContent=s.es;
-  document.getElementById('sd-translations').innerHTML=hasT
-    ?s.translations.map((t,i)=>`<div class="detail-section"><div class="detail-sec-label">${s.translations.length>1?'Translation '+(i+1):'Translation'}</div><div class="detail-sec-text">${t}</div></div>`).join('')
-    :'<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet</div></div>';
-  const daysAgo=s.lastPracticed?Math.floor((Date.now()-new Date(s.lastPracticed))/86400000):null;
-  document.getElementById('sd-lastprac').textContent=daysAgo===null?'Never':(daysAgo===0?'Today':(daysAgo===1?'Yesterday':daysAgo+' days ago'));
-  document.getElementById('sd-status').innerHTML=`
-    <button class="status-btn status-learning ${s.status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
-    <button class="status-btn status-learned ${s.status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
+function showSentDetail(id) {
+  const s = sentences.find(x => x.id === id); if (!s) return;
+  curSentDetailId = id; lastScreen = document.querySelector('.screen.active').id;
+  const hasT = s.translations && s.translations.length > 0;
+  document.getElementById('sd-es').textContent = s.es;
+  document.getElementById('sd-translations').innerHTML = hasT
+    ? s.translations.map((t, i) => `<div class="detail-section"><div class="detail-sec-label">${s.translations.length > 1 ? 'Translation ' + (i + 1) : 'Translation'}</div><div class="detail-sec-text">${t}</div></div>`).join('')
+    : '<div class="detail-section"><div class="detail-sec-label">Translation</div><div class="detail-sec-text" style="color:var(--tx3);font-style:italic;">No translations yet</div></div>';
+  const daysAgo = s.lastPracticed ? Math.floor((Date.now() - new Date(s.lastPracticed)) / 86400000) : null;
+  document.getElementById('sd-lastprac').textContent = daysAgo === null ? 'Never' : (daysAgo === 0 ? 'Today' : (daysAgo === 1 ? 'Yesterday' : daysAgo + ' days ago'));
+  document.getElementById('sd-status').innerHTML = `
+    <button class="status-btn status-learning ${s.status === 'learning' ? 'active-s' : ''}" onclick="setSentStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${s.status === 'learned' ? 'active-s' : ''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
   showScreen('s-sent-detail');
 }
-async function setSentStatus(status){
-  const s=sentences.find(x=>x.id===curSentDetailId);if(!s)return;
-  s.status=status;await saveAndSync();
-  document.getElementById('sd-status').innerHTML=`
-    <button class="status-btn status-learning ${status==='learning'?'active-s':''}" onclick="setSentStatus('learning')">To learn</button>
-    <button class="status-btn status-learned ${status==='learned'?'active-s':''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
-  showToast(status==='learned'?'✓ Marked as learned':'Moved to to learn');
+async function setSentStatus(status) {
+  const s = sentences.find(x => x.id === curSentDetailId); if (!s) return;
+  s.status = status; await saveAndSync();
+  document.getElementById('sd-status').innerHTML = `
+    <button class="status-btn status-learning ${status === 'learning' ? 'active-s' : ''}" onclick="setSentStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${status === 'learned' ? 'active-s' : ''}" onclick="setSentStatus('learned')">Learned ✓</button>`;
+  showToast(status === 'learned' ? '✓ Marked as learned' : 'Moved to to learn');
 }
-function deleteSentenceFromDetail(){
-  if(!confirm('Delete this sentence? This cannot be undone.')) return;
-  sentences=sentences.filter(s=>s.id!==curSentDetailId);saveAndSync();goBack();showToast('Sentence deleted');
+function deleteSentenceFromDetail() {
+  if (!confirm('Delete this sentence? This cannot be undone.')) return;
+  sentences = sentences.filter(s => s.id !== curSentDetailId); saveAndSync(); goBack(); showToast('Sentence deleted');
 }
 
 // ── WORD DETAIL ───────────────────────────────────
-function showDetail(id){
-  const w=words.find(x=>x.id===id);if(!w)return;
-  curDetailId=id;lastScreen=document.querySelector('.screen.active').id;
-  document.getElementById('d-word').textContent=w.en;
-  document.getElementById('d-pron').textContent=w.pron||'';
-  document.getElementById('d-type').textContent=w.type;
-  document.getElementById('d-es').textContent=w.es||'—';
-  document.getElementById('d-ex').textContent=w.example||'—';
-  document.getElementById('d-ex-wrap').style.display=w.example?'block':'none';
-  const lvlEl=document.getElementById('d-level');
-  if(w.level){lvlEl.textContent=w.level;lvlEl.className=`lvl-badge lvl-${w.level}`;}
-  else{lvlEl.textContent='—';lvlEl.className='detail-sec-text';}
-  const lpEl=document.getElementById('d-lastprac');
-  if(w.lastPracticed){const d=Math.floor((Date.now()-new Date(w.lastPracticed))/(1000*60*60*24));lpEl.textContent=d===0?'Today':(d===1?'Yesterday':`Last ${d} days`);}
-  else lpEl.textContent='Never';
-  document.getElementById('d-status').innerHTML=`
-    <button class="status-btn status-learning ${w.status==='learning'?'active-s':''}" onclick="setStatus('learning')">To learn</button>
-    <button class="status-btn status-learned ${w.status==='learned'?'active-s':''}" onclick="setStatus('learned')">Learned ✓</button>`;
+function showDetail(id) {
+  const w = words.find(x => x.id === id); if (!w) return;
+  curDetailId = id; lastScreen = document.querySelector('.screen.active').id;
+  document.getElementById('d-word').textContent = w.en;
+  document.getElementById('d-pron').textContent = w.pron || '';
+  document.getElementById('d-type').textContent = w.type;
+  document.getElementById('d-es').textContent = w.es || '—';
+  document.getElementById('d-ex').textContent = w.example || '—';
+  document.getElementById('d-ex-wrap').style.display = w.example ? 'block' : 'none';
+  const lvlEl = document.getElementById('d-level');
+  if (w.level) { lvlEl.textContent = w.level; lvlEl.className = `lvl-badge lvl-${w.level}`; }
+  else { lvlEl.textContent = '—'; lvlEl.className = 'detail-sec-text'; }
+  const lpEl = document.getElementById('d-lastprac');
+  if (w.lastPracticed) { const d = Math.floor((Date.now() - new Date(w.lastPracticed)) / (1000 * 60 * 60 * 24)); lpEl.textContent = d === 0 ? 'Today' : (d === 1 ? 'Yesterday' : `Last ${d} days`); }
+  else lpEl.textContent = 'Never';
+  document.getElementById('d-status').innerHTML = `
+    <button class="status-btn status-learning ${w.status === 'learning' ? 'active-s' : ''}" onclick="setStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${w.status === 'learned' ? 'active-s' : ''}" onclick="setStatus('learned')">Learned ✓</button>`;
   showScreen('s-detail');
 }
-async function setStatus(s){
-  const w=words.find(x=>x.id===curDetailId);if(!w)return;
-  w.status=s;await saveAndSync();
-  document.getElementById('d-status').innerHTML=`
-    <button class="status-btn status-learning ${s==='learning'?'active-s':''}" onclick="setStatus('learning')">To learn</button>
-    <button class="status-btn status-learned ${s==='learned'?'active-s':''}" onclick="setStatus('learned')">Learned ✓</button>`;
-  showToast(s==='learned'?'✓ Marked as learned':'Moved to to learn');
+async function setStatus(s) {
+  const w = words.find(x => x.id === curDetailId); if (!w) return;
+  w.status = s; await saveAndSync();
+  document.getElementById('d-status').innerHTML = `
+    <button class="status-btn status-learning ${s === 'learning' ? 'active-s' : ''}" onclick="setStatus('learning')">To learn</button>
+    <button class="status-btn status-learned ${s === 'learned' ? 'active-s' : ''}" onclick="setStatus('learned')">Learned ✓</button>`;
+  showToast(s === 'learned' ? '✓ Marked as learned' : 'Moved to to learn');
 }
-function deleteWord(){
-  if(!confirm('Delete this word? This cannot be undone.')) return;
-  words=words.filter(w=>w.id!==curDetailId);saveAndSync();goBack();showToast('Word deleted');
+function deleteWord() {
+  if (!confirm('Delete this word? This cannot be undone.')) return;
+  words = words.filter(w => w.id !== curDetailId); saveAndSync(); goBack(); showToast('Word deleted');
 }
 
 // ── ADD / IMPORT ──────────────────────────────────
-function selType(el,t){selWordType=t;document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
-function selLevel(el,l){selWordLevel=l;document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
-function goToAddWord(){
-  lastScreen='s-vocab';showScreen('s-add');
-  const tabs=document.querySelectorAll('#add-tabs .tab');
-  tabs.forEach(b=>b.classList.remove('on'));tabs[0].classList.add('on');
-  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('add-manual').style.display='flex';
+function selType(el, t) { selWordType = t; document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('on')); el.classList.add('on'); }
+function selLevel(el, l) { selWordLevel = l; document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('on')); el.classList.add('on'); }
+function goToAddWord() {
+  lastScreen = 's-vocab'; showScreen('s-add');
+  const tabs = document.querySelectorAll('#add-tabs .tab');
+  tabs.forEach(b => b.classList.remove('on')); tabs[0].classList.add('on');
+  ['add-manual', 'add-import', 'add-sentences'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('add-manual').style.display = 'flex';
 }
-function goToAddSentences(){
-  lastScreen='s-sentences';showScreen('s-add');
-  const tabs=document.querySelectorAll('#add-tabs .tab');
-  tabs.forEach(b=>b.classList.remove('on'));tabs[2].classList.add('on');
-  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('add-sentences').style.display='block';
+function goToAddSentences() {
+  lastScreen = 's-sentences'; showScreen('s-add');
+  const tabs = document.querySelectorAll('#add-tabs .tab');
+  tabs.forEach(b => b.classList.remove('on')); tabs[2].classList.add('on');
+  ['add-manual', 'add-import', 'add-sentences'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('add-sentences').style.display = 'block';
 }
-function setAddTab(tab,btn){
-  ['add-manual','add-import','add-sentences'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('add-'+tab).style.display=tab==='manual'?'flex':'block';
-  document.querySelectorAll('#add-tabs .tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+function setAddTab(tab, btn) {
+  ['add-manual', 'add-import', 'add-sentences'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('add-' + tab).style.display = tab === 'manual' ? 'flex' : 'block';
+  document.querySelectorAll('#add-tabs .tab').forEach(b => b.classList.remove('on')); btn.classList.add('on');
 }
-async function addManual(){
-  const en=document.getElementById('f-en').value.trim();if(!en){showToast('Enter the English word');return;}
-  words.push({id:Date.now(),en,es:document.getElementById('f-es').value.trim(),pron:document.getElementById('f-pron').value.trim(),type:selWordType,level:selWordLevel,example:document.getElementById('f-ex').value.trim(),status:'learning',lastPracticed:null});
-  await saveAndSync();updateStats();
-  ['f-en','f-es','f-pron','f-ex'].forEach(id=>document.getElementById(id).value='');
-  document.querySelectorAll('.level-pill').forEach(p=>p.classList.remove('on'));
-  document.getElementById('lp-none').classList.add('on');selWordLevel='';
+async function addManual() {
+  const en = document.getElementById('f-en').value.trim(); if (!en) { showToast('Enter the English word'); return; }
+  words.push({ id: Date.now(), en, es: document.getElementById('f-es').value.trim(), pron: document.getElementById('f-pron').value.trim(), type: selWordType, level: selWordLevel, example: document.getElementById('f-ex').value.trim(), status: 'learning', lastPracticed: null });
+  await saveAndSync(); updateStats();
+  ['f-en', 'f-es', 'f-pron', 'f-ex'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('.level-pill').forEach(p => p.classList.remove('on'));
+  document.getElementById('lp-none').classList.add('on'); selWordLevel = '';
   showToast('✓ Word saved');
 }
-async function importWords(){
-  const text=document.getElementById('imp-text').value.trim();if(!text)return;
-  let count=0;
-  text.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
-    const m=line.match(/^(\S+)\s+(adj|adv|n|v|phr|phrase)\s+(\/[^/]+\/)?\s*(.*)$/i);
-    if(m){words.push({id:Date.now()+count,en:m[1],type:m[2].toLowerCase(),pron:m[3]?m[3].trim():'',example:m[4].trim(),es:'',level:'',status:'learning',lastPracticed:null});count++;}
-    else if(line.length>2){const p=line.split(/\s+/);words.push({id:Date.now()+count,en:p[0],type:'n',pron:'',example:p.slice(1).join(' '),es:'',level:'',status:'learning',lastPracticed:null});count++;}
+async function importWords() {
+  const text = document.getElementById('imp-text').value.trim(); if (!text) return;
+  let count = 0;
+  text.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
+    const m = line.match(/^(\S+)\s+(adj|adv|n|v|phr|phrase)\s+(\/[^/]+\/)?\s*(.*)$/i);
+    if (m) { words.push({ id: Date.now() + count, en: m[1], type: m[2].toLowerCase(), pron: m[3] ? m[3].trim() : '', example: m[4].trim(), es: '', level: '', status: 'learning', lastPracticed: null }); count++; }
+    else if (line.length > 2) { const p = line.split(/\s+/); words.push({ id: Date.now() + count, en: p[0], type: 'n', pron: '', example: p.slice(1).join(' '), es: '', level: '', status: 'learning', lastPracticed: null }); count++; }
   });
-  await saveAndSync();updateStats();
-  document.getElementById('imp-result').textContent=`✓ ${count} words imported`;
-  document.getElementById('imp-text').value='';showToast(`✓ ${count} words imported`);
+  await saveAndSync(); updateStats();
+  document.getElementById('imp-result').textContent = `✓ ${count} words imported`;
+  document.getElementById('imp-text').value = ''; showToast(`✓ ${count} words imported`);
 }
-async function importSentences(){
-  const text=document.getElementById('fras-text').value.trim();if(!text)return;
-  let count=0;
-  text.split('\n').map(l=>l.trim().replace(/^\d+\.\s*/,'')).filter(l=>l.length>5).forEach(line=>{sentences.push({id:Date.now()+count,es:line,status:'learning',lastPracticed:null,translations:[]});count++;});
-  await saveAndSync();updateStats();
-  document.getElementById('fras-result').textContent=`✓ ${count} sentences importadas`;
-  document.getElementById('fras-text').value='';showToast(`✓ ${count} sentences importadas`);
+async function importSentences() {
+  const text = document.getElementById('fras-text').value.trim(); if (!text) return;
+  let count = 0;
+  text.split('\n').map(l => l.trim().replace(/^\d+\.\s*/, '')).filter(l => l.length > 5).forEach(line => { sentences.push({ id: Date.now() + count, es: line, status: 'learning', lastPracticed: null, translations: [] }); count++; });
+  await saveAndSync(); updateStats();
+  document.getElementById('fras-result').textContent = `✓ ${count} sentences importadas`;
+  document.getElementById('fras-text').value = ''; showToast(`✓ ${count} sentences importadas`);
 }
 
 // ── SMART PRACTICE SELECTION ──────────────────────
-function buildSmartQueue(pool,total){
-  const now=Date.now(), dayMs=86400000;
-  const scored=pool.map(w=>{
-    let score=0;
-    const daysSince=w.lastPracticed?Math.floor((now-new Date(w.lastPracticed))/dayMs):999;
-    score+=Math.min(daysSince,30)*2;
-    if(!w.lastPracticed) score+=20;
-    if(w.level==='C1'||w.level==='C2') score+=15;
-    if(w.level==='A1'||w.level==='A2') score+=8;
-    if(w.status==='learned') score-=5;
-    score+=Math.random()*15;
-    return {w,score};
+function buildSmartQueue(pool, total) {
+  const now = Date.now(), dayMs = 86400000;
+  const scored = pool.map(w => {
+    let score = 0;
+    const daysSince = w.lastPracticed ? Math.floor((now - new Date(w.lastPracticed)) / dayMs) : 999;
+    score += Math.min(daysSince, 30) * 2;
+    if (!w.lastPracticed) score += 20;
+    if (w.level === 'C1' || w.level === 'C2') score += 15;
+    if (w.level === 'A1' || w.level === 'A2') score += 8;
+    if (w.status === 'learned') score -= 5;
+    score += Math.random() * 15;
+    return { w, score };
   });
-  return scored.sort((a,b)=>b.score-a.score).slice(0,total).map(s=>s.w).sort(()=>Math.random()-.5);
+  return scored.sort((a, b) => b.score - a.score).slice(0, total).map(s => s.w).sort(() => Math.random() - .5);
 }
 
-function startMode(mode){
-  pMode=mode;pIdx=0;pCorrect=0;
-  const names={'es-en':'ESP → ING','recall':'Do you know it?','sentences':'Translate sentences','fill':'Fill in frase'};
-  document.getElementById('p-title').textContent=names[mode]||mode;
-  if(mode==='sentences'){
-    if(!sentences.length){showToast('No sentences yet. Import some first.');return;}
-    pQueue=buildSmartQueue(sentences,8);
-  }else if(mode==='fill'){
-    const pool=words.filter(w=>w.example);
-    pQueue=buildSmartQueue(pool,8);
-    if(!pQueue.length){showToast('You need words with examples for this mode.');return;}
-  }else{
-    if(!words.length){showToast('Add words to practice.');return;}
-    pQueue=buildSmartQueue(words,10);
+function startMode(mode) {
+  pMode = mode; pIdx = 0; pCorrect = 0;
+  const names = { 'es-en': 'ESP → ING', 'recall': 'Do you know it?', 'sentences': 'Translate sentences', 'fill': 'Fill in frase' };
+  document.getElementById('p-title').textContent = names[mode] || mode;
+  if (mode === 'sentences') {
+    if (!sentences.length) { showToast('No sentences yet. Import some first.'); return; }
+    pQueue = buildSmartQueue(sentences, 8);
+  } else if (mode === 'fill') {
+    const pool = words.filter(w => w.example);
+    pQueue = buildSmartQueue(pool, 8);
+    if (!pQueue.length) { showToast('You need words with examples for this mode.'); return; }
+  } else {
+    if (!words.length) { showToast('Add words to practice.'); return; }
+    pQueue = buildSmartQueue(words, 10);
   }
-  // NOTE: we do NOT call markPracticeToday() here.
-  // The day is only logged when the session is COMPLETED (showResults).
-  // This prevents partial sessions from counting toward the streak.
-  lastScreen='s-home';showScreen('s-practice');renderQ();
+  lastScreen = 's-home'; showScreen('s-practice'); renderQ();
 }
-function startSameMode(){if(pMode)startMode(pMode);}
+function startSameMode() { if (pMode) startMode(pMode); }
 
 // ── PRACTICE RENDER ───────────────────────────────
-function markWordPracticed(item){
-  if(item.en){
-    const w=words.find(x=>x.id===item.id);
-    if(w){w.lastPracticed=new Date().toISOString();w.practiceCount=(w.practiceCount||0)+1;saveLocal();}
+function markWordPracticed(item) {
+  if (item.en) {
+    const w = words.find(x => x.id === item.id);
+    if (w) { w.lastPracticed = new Date().toISOString(); w.practiceCount = (w.practiceCount || 0) + 1; saveLocal(); }
   }
 }
-function renderQ(){
-  const item=pQueue[pIdx];
+function renderQ() {
+  const item = pQueue[pIdx];
   markWordPracticed(item);
-  document.getElementById('p-prog').style.width=Math.round((pIdx/pQueue.length)*100)+'%';
-  document.getElementById('p-count').textContent=`${pIdx+1}/${pQueue.length}`;
-  const lvlTag=item.level?`<span class="lvl-badge lvl-${item.level}" style="font-size:11px;">${item.level}</span> `:'';
-  let html='';
-  if(pMode==='es-en'){
-    html=`<div class="q-label">How do you say it in English?</div>
-    <div class="q-card"><div class="q-word">${item.es||item.en}</div><div class="q-sub">${lvlTag}${item.type||''}</div></div>
+  document.getElementById('p-prog').style.width = Math.round((pIdx / pQueue.length) * 100) + '%';
+  document.getElementById('p-count').textContent = `${pIdx + 1}/${pQueue.length}`;
+  const lvlTag = item.level ? `<span class="lvl-badge lvl-${item.level}" style="font-size:11px;">${item.level}</span> ` : '';
+  let html = '';
+  if (pMode === 'es-en') {
+    html = `<div class="q-label">How do you say it in English?</div>
+    <div class="q-card"><div class="q-word">${item.es || item.en}</div><div class="q-sub">${lvlTag}${item.type || ''}</div></div>
     <div class="mic-wrap"><input class="ans-inp" id="a-inp" placeholder="Type in English..." onkeydown="if(event.key==='Enter')checkWord()"/><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">Correction</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkWord()">Check</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
-  }else if(pMode==='recall'){
-    html=`<div class="q-label">Do you know what it means?</div>
+  } else if (pMode === 'recall') {
+    html = `<div class="q-label">Do you know what it means?</div>
     <div class="flip-wrap" onclick="doFlip()">
       <div class="flip-card" id="flip-card">
         <div class="flip-face flip-front">
           <div class="q-word">${item.en}</div>
-          <div class="q-sub">${lvlTag}${item.type||''}</div>
-          ${item.pron?`<div style="font-size:13px;color:var(--soft);margin-top:6px;font-style:italic;">${item.pron}</div>`:''}
+          <div class="q-sub">${lvlTag}${item.type || ''}</div>
+          ${item.pron ? `<div style="font-size:13px;color:var(--soft);margin-top:6px;font-style:italic;">${item.pron}</div>` : ''}
           <div class="flip-hint">Tap to see the meaning</div>
         </div>
         <div class="flip-face flip-back">
-          <div class="q-word" style="font-size:22px;">${item.es||'—'}</div>
-          ${item.example?`<div style="font-size:12px;color:var(--tx3);margin-top:10px;line-height:1.5;">${item.example}</div>`:''}
+          <div class="q-word" style="font-size:22px;">${item.es || '—'}</div>
+          ${item.example ? `<div style="font-size:12px;color:var(--tx3);margin-top:10px;line-height:1.5;">${item.example}</div>` : ''}
         </div>
       </div>
     </div>
@@ -1086,157 +1093,153 @@ function renderQ(){
       <button class="eval-btn eval-forgot" onclick="selfEval(false)">Didn't know it</button>
       <button class="eval-btn eval-knew" onclick="selfEval(true)">Knew it ✓</button>
     </div>`;
-  }else if(pMode==='sentences'){
-    html=`<div class="q-label">Translate to English:</div>
+  } else if (pMode === 'sentences') {
+    html = `<div class="q-label">Translate to English:</div>
     <div class="sent-card"><div class="sent-es">${item.es}</div><div class="sent-hint">Write the best you can</div></div>
     <div class="mic-ta-wrap"><textarea class="ans-inp ans-ta" id="a-inp" placeholder="Your translation here..."></textarea><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">AI Correction</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkSentence()">Submit for correction</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
-  }else if(pMode==='fill'){
-    const blank=item.example.replace(new RegExp(`\\b${item.en}\\b`,'i'),'______');
-    html=`<div class="q-label">Complete the sentence:</div>
-    <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}${item.type} ${item.pron||''}</div></div>
+  } else if (pMode === 'fill') {
+    const blank = item.example.replace(new RegExp(`\\b${item.en}\\b`, 'i'), '______');
+    html = `<div class="q-label">Complete the sentence:</div>
+    <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}${item.type} ${item.pron || ''}</div></div>
     <div class="mic-wrap"><input class="ans-inp" id="a-inp" placeholder="The missing word..." onkeydown="if(event.key==='Enter')checkFill()"/><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">Result</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkFill()">Check</button>
     <button class="btn-out" id="btn-next" onclick="nextQ()">Next →</button>`;
   }
-  document.getElementById('p-body').innerHTML=html;
-  if(document.getElementById('a-inp'))setTimeout(()=>document.getElementById('a-inp').focus(),100);
+  document.getElementById('p-body').innerHTML = html;
+  if (document.getElementById('a-inp')) setTimeout(() => document.getElementById('a-inp').focus(), 100);
 }
 
-function doFlip(){
-  const card=document.getElementById('flip-card');
-  const isFlipped=card.classList.contains('flipped');
+function doFlip() {
+  const card = document.getElementById('flip-card');
+  const isFlipped = card.classList.contains('flipped');
   card.classList.toggle('flipped');
-  document.getElementById('eval-row').style.display=isFlipped?'none':'flex';
+  document.getElementById('eval-row').style.display = isFlipped ? 'none' : 'flex';
 }
-async function selfEval(knew){
-  document.querySelectorAll('.eval-btn').forEach(b=>b.disabled=true);
-  if(knew){pCorrect++;const item=pQueue[pIdx];if(item&&item.en){const w=words.find(x=>x.id===item.id);if(w&&w.status!=='learned'){w.status='learned';saveLocal();if(sheetURL)syncToSheet();}}}
+async function selfEval(knew) {
+  document.querySelectorAll('.eval-btn').forEach(b => b.disabled = true);
+  if (knew) { pCorrect++; const item = pQueue[pIdx]; if (item && item.en) { const w = words.find(x => x.id === item.id); if (w && w.status !== 'learned') { w.status = 'learned'; saveLocal(); if (sheetURL) syncToSheet(); } } }
   nextQ();
 }
-async function checkWord(){
-  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
-  const item=pQueue[pIdx];const ok=ans.toLowerCase()===item.en.toLowerCase();
-  inp.classList.add(ok?'ok':'err');
-  if(ok){pCorrect++;showFB('✓ ¡Correcto!',false);}
-  else await getAI(`Estoy aprendiendo inglés. La palabra en español era "${item.es||item.en}". Escribí "${ans}" pero la respuesta correcta es "${item.en}". Dame una corrección breve y amigable en español, con algún tip para recordarla. Máximo 3 líneas.`);
-  document.getElementById('btn-check').style.display='none';document.getElementById('btn-next').style.display='block';
+async function checkWord() {
+  const inp = document.getElementById('a-inp'); const ans = inp.value.trim(); if (!ans) return;
+  const item = pQueue[pIdx]; const ok = ans.toLowerCase() === item.en.toLowerCase();
+  inp.classList.add(ok ? 'ok' : 'err');
+  if (ok) { pCorrect++; showFB('✓ ¡Correcto!', false); }
+  else await getAI(`Estoy aprendiendo inglés. La palabra en español era "${item.es || item.en}". Escribí "${ans}" pero la respuesta correcta es "${item.en}". Dame una corrección breve y amigable en español, con algún tip para recordarla. Máximo 3 líneas.`);
+  document.getElementById('btn-check').style.display = 'none'; document.getElementById('btn-next').style.display = 'block';
 }
-async function checkSentence(){
-  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
-  const item=pQueue[pIdx];inp.disabled=true;
-  document.getElementById('btn-check').style.display='none';pCorrect++;
+async function checkSentence() {
+  const inp = document.getElementById('a-inp'); const ans = inp.value.trim(); if (!ans) return;
+  const item = pQueue[pIdx]; inp.disabled = true;
+  document.getElementById('btn-check').style.display = 'none'; pCorrect++;
   await getAI(`Estoy aprendiendo inglés. Debía traducir: "${item.es}". Escribí: "${ans}". Corregime de forma amigable en español: decime si está bien, qué mejorar, y cómo quedaría la frase correcta. Máximo 4 líneas.`);
-  document.getElementById('btn-next').style.display='block';
+  document.getElementById('btn-next').style.display = 'block';
 }
-function checkFill(){
-  const inp=document.getElementById('a-inp');const ans=inp.value.trim();if(!ans)return;
-  const item=pQueue[pIdx];const ok=ans.toLowerCase()===item.en.toLowerCase();
-  inp.classList.add(ok?'ok':'err');
-  if(ok){pCorrect++;showFB(`✓ ¡Perfecto! La palabra es "${item.en}"`,false);}
-  else showFB(`✗ Era "${item.en}"${item.es?' — '+item.es:''}`,false);
-  document.getElementById('btn-check').style.display='none';document.getElementById('btn-next').style.display='block';
+function checkFill() {
+  const inp = document.getElementById('a-inp'); const ans = inp.value.trim(); if (!ans) return;
+  const item = pQueue[pIdx]; const ok = ans.toLowerCase() === item.en.toLowerCase();
+  inp.classList.add(ok ? 'ok' : 'err');
+  if (ok) { pCorrect++; showFB(`✓ ¡Perfecto! La palabra es "${item.en}"`, false); }
+  else showFB(`✗ Era "${item.en}"${item.es ? ' — ' + item.es : ''}`, false);
+  document.getElementById('btn-check').style.display = 'none'; document.getElementById('btn-next').style.display = 'block';
 }
-function nextQ(){pIdx++;if(pIdx>=pQueue.length)showResults();else renderQ();}
+function nextQ() { pIdx++; if (pIdx >= pQueue.length) showResults(); else renderQ(); }
 
-function showFB(text,loading){
-  const box=document.getElementById('ai-box');box.classList.add('show');
-  document.getElementById('ai-txt').innerHTML=loading?'<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>':text;
+function showFB(text, loading) {
+  const box = document.getElementById('ai-box'); box.classList.add('show');
+  document.getElementById('ai-txt').innerHTML = loading ? '<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>' : text;
 }
-async function getAI(prompt){
-  showFB('',true);
-  try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    document.getElementById('ai-txt').textContent=d.content?.map(c=>c.text||'').join('')||'No response.';
-  }catch{document.getElementById('ai-txt').textContent='Could not connect to AI.';}
+async function getAI(prompt) {
+  showFB('', true);
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] }) });
+    const d = await r.json();
+    document.getElementById('ai-txt').textContent = d.content?.map(c => c.text || '').join('') || 'No response.';
+  } catch { document.getElementById('ai-txt').textContent = 'Could not connect to AI.'; }
 }
 
-// ── RESULTS & STREAK RECORDING ────────────────────
-// markPracticeToday() is called HERE — only when the full session completes.
-// This means:
-//   - Closing mid-session does NOT count as a practice day.
-//   - All 4 practice modes reach this function.
-//   - The local log accumulates across days; the sheet merges without overwriting.
-function showResults(){
-  const streak=markPracticeToday(); // ← record the day NOW, get updated streak back
-  const pct=pQueue.length?Math.round((pCorrect/pQueue.length)*100):0;
-  let title='Excellent!',iconSVG,iconBg;
-  if(pct>=80){title='Excellent!';iconBg='rgba(74,222,128,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
-  else if(pct>=50){title='Well done!';iconBg='rgba(193,105,214,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>';}
-  else if(pct>=20){title='Keep going!';iconBg='rgba(251,191,36,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';}
-  else{title='Keep practicing!';iconBg='rgba(248,113,113,.15)';iconSVG='<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#f87171;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';}
-  document.getElementById('r-icon').style.background=iconBg;
-  document.getElementById('r-icon').innerHTML=iconSVG;
-  document.getElementById('r-title').textContent=title;
-  document.getElementById('r-sub').textContent=`${pct}% correct`;
-  document.getElementById('r-streak').textContent=`🔥 ${streak} day${streak!==1?'s':''}`;
-  document.getElementById('r-correct').textContent=pCorrect;
-  document.getElementById('r-total').textContent=pQueue.length;
+// ══════════════════════════════════════════════════
+//  SHOW RESULTS — called when a session is fully completed.
+//  This is the ONLY place markPracticeToday() is called.
+// ══════════════════════════════════════════════════
+async function showResults() {
+  const pct = pQueue.length ? Math.round((pCorrect / pQueue.length) * 100) : 0;
+
+  // Show result screen immediately with a placeholder streak
+  let title = 'Excellent!', iconSVG, iconBg;
+  if (pct >= 80)      { title = 'Excellent!';       iconBg = 'rgba(74,222,128,.15)';   iconSVG = '<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#4ade80;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>'; }
+  else if (pct >= 50) { title = 'Well done!';        iconBg = 'rgba(193,105,214,.15)';  iconSVG = '<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#c169d6;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>'; }
+  else if (pct >= 20) { title = 'Keep going!';       iconBg = 'rgba(251,191,36,.15)';   iconSVG = '<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#fbbf24;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'; }
+  else                { title = 'Keep practicing!';  iconBg = 'rgba(248,113,113,.15)';  iconSVG = '<svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#f87171;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'; }
+
+  document.getElementById('r-icon').style.background = iconBg;
+  document.getElementById('r-icon').innerHTML = iconSVG;
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-sub').textContent = `${pct}% correct`;
+  document.getElementById('r-correct').textContent = pCorrect;
+  document.getElementById('r-total').textContent = pQueue.length;
+  document.getElementById('r-streak').textContent = '🔥 …';
   showScreen('s-result');
+
+  // Now record today and update streak (may take a moment if hitting the Sheet)
+  const streak = await markPracticeToday();
+  document.getElementById('r-streak').textContent = `🔥 ${streak} day${streak !== 1 ? 's' : ''}`;
 }
 
 // ── SETTINGS ──────────────────────────────────────
-function openSyncModal(){document.getElementById('sheet-url-inp').value=sheetURL||'';document.getElementById('sync-modal').style.display='flex';}
-function closeSyncModal(e){if(e.target===document.getElementById('sync-modal'))document.getElementById('sync-modal').style.display='none';}
-async function saveSheetURL(){
-  const url=document.getElementById('sheet-url-inp').value.trim();if(!url){showToast('Paste the script URL');return;}
-  sheetURL=url;ls(SHEETK,url);
-  document.getElementById('sheet-status-label').textContent='Conectado ✓';
-  document.getElementById('sync-modal').style.display='none';
+function openSyncModal() { document.getElementById('sheet-url-inp').value = sheetURL || ''; document.getElementById('sync-modal').style.display = 'flex'; }
+function closeSyncModal(e) { if (e.target === document.getElementById('sync-modal')) document.getElementById('sync-modal').style.display = 'none'; }
+async function saveSheetURL() {
+  const url = document.getElementById('sheet-url-inp').value.trim(); if (!url) { showToast('Paste the script URL'); return; }
+  sheetURL = url; ls(SHEETK, url);
+  document.getElementById('sheet-status-label').textContent = 'Conectado ✓';
+  document.getElementById('sync-modal').style.display = 'none';
   showToast('✓ URL saved — loading data...');
   await syncFromSheet(false);
 }
-function exportData(){
-  const practiceLog=[...loadPracticeLog()].sort();
-  const a=document.createElement('a');
-  a.href='data:application/json,'+encodeURIComponent(JSON.stringify({words,sentences,practiceLog},null,2));
-  a.download='lingo-backup.json';a.click();
+function exportData() {
+  const a = document.createElement('a');
+  a.href = 'data:application/json,' + encodeURIComponent(JSON.stringify({ words, sentences }, null, 2));
+  a.download = 'lingo-backup.json'; a.click();
 }
-function importJSON(e){
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=async ev=>{
-    try{
-      const d=JSON.parse(ev.target.result);
-      if(d.words){words=d.words;lsJ(WK,words);}
-      if(d.sentences){sentences=d.sentences;lsJ(SK,sentences);}
-      if(d.practiceLog&&Array.isArray(d.practiceLog)){
-        // Merge imported log with existing local log — never replace
-        const existing=loadPracticeLog();
-        d.practiceLog.forEach(dt=>existing.add(dt));
-        savePracticeLog(existing);
-        updateStreakPill(calcStreak(existing));
-      }
-      await saveAndSync();updateStats();renderHomeRecent();renderVocab();showToast('✓ Data imported');
-    }catch{showToast('Error reading file');}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = async ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.words) { words = d.words; lsJ(WK, words); }
+      if (d.sentences) { sentences = d.sentences; lsJ(SK, sentences); }
+      await saveAndSync(); updateStats(); renderHomeRecent(); renderVocab(); showToast('✓ Data imported');
+    } catch { showToast('Error reading file'); }
   };
   r.readAsText(file);
 }
 
 // ── MICROPHONE ────────────────────────────────────
-let micRecognition=null, micActive=false;
-function toggleMic(inputId){
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){showToast('Speech recognition not supported in this browser');return;}
-  if(micActive){stopMic();return;}
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  micRecognition=new SpeechRecognition();
-  micRecognition.lang='en-US';micRecognition.continuous=false;micRecognition.interimResults=false;
-  micRecognition.onstart=()=>{micActive=true;const btn=document.getElementById('mic-btn');if(btn)btn.classList.add('listening');showToast('🎤 Listening...');};
-  micRecognition.onresult=(e)=>{const transcript=e.results[0][0].transcript;const inp=document.getElementById(inputId);if(inp){if(inp.tagName==='TEXTAREA')inp.value=(inp.value?inp.value+' ':'')+transcript;else inp.value=transcript;}};
-  micRecognition.onerror=(e)=>{showToast('Mic error: '+e.error);stopMic();};
-  micRecognition.onend=()=>{stopMic();};
+let micRecognition = null, micActive = false;
+function toggleMic(inputId) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { showToast('Speech recognition not supported in this browser'); return; }
+  if (micActive) { stopMic(); return; }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  micRecognition = new SpeechRecognition();
+  micRecognition.lang = 'en-US'; micRecognition.continuous = false; micRecognition.interimResults = false;
+  micRecognition.onstart = () => { micActive = true; const btn = document.getElementById('mic-btn'); if (btn) btn.classList.add('listening'); showToast('🎤 Listening...'); };
+  micRecognition.onresult = (e) => { const transcript = e.results[0][0].transcript; const inp = document.getElementById(inputId); if (inp) { if (inp.tagName === 'TEXTAREA') inp.value = (inp.value ? inp.value + ' ' : '') + transcript; else inp.value = transcript; } };
+  micRecognition.onerror = (e) => { showToast('Mic error: ' + e.error); stopMic(); };
+  micRecognition.onend = () => { stopMic(); };
   micRecognition.start();
 }
-function stopMic(){micActive=false;const btn=document.getElementById('mic-btn');if(btn)btn.classList.remove('listening');if(micRecognition){try{micRecognition.stop();}catch(e){}micRecognition=null;}}
+function stopMic() { micActive = false; const btn = document.getElementById('mic-btn'); if (btn) btn.classList.remove('listening'); if (micRecognition) { try { micRecognition.stop(); } catch (e) { } micRecognition = null; } }
 
 // ── TOAST ─────────────────────────────────────────
-function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 load();
