@@ -1366,12 +1366,8 @@ function showToast(msg) {
 
 async function testConnection() {
   const el = document.getElementById('test-result');
-  const log = localStorage.getItem('lingo_practice_log');
-  const streak = localStorage.getItem('lingo_streak');
-  el.textContent = 'LOG: ' + log + ' | STREAK_KEY: ' + streak;
-  return;
+  el.textContent = 'Probando...';
   if (!sheetURL) { el.textContent = 'ERROR: no hay URL guardada'; return; }
-  el.textContent = 'URL: ' + sheetURL.slice(0, 60) + '...';
   try {
     const r = await fetch(sheetURL + '?action=get');
     const text = await r.text();
