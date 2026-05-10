@@ -744,7 +744,10 @@ async function sheetGet() {
 // ─────────────────────────────────────────────────────────────
 function pushLogToSheet(log) {
   if (!sheetURL) return;
-  sheetPost({ action: 'appendPracticeLog', practiceLog: log }).catch(() => {});
+  const params = new URLSearchParams();
+  params.append('action', 'recordPractice');
+  params.append('data', JSON.stringify({ action: 'recordPractice', fecha: todayKey() }));
+  fetch(sheetURL, { method: 'POST', body: params }).catch(() => {});
 }
 
 // ─────────────────────────────────────────────────────────────
