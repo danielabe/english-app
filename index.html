@@ -1265,7 +1265,7 @@ async function getAI(prompt) {
 // ─────────────────────────────────────────────────────────────
 // RESULTS — streak is recorded HERE (session complete)
 // ─────────────────────────────────────────────────────────────
-function showResults() {
+async function showResults() {
   // 1. Log today to local storage (idempotent — won't double-add same day)
   const log = logToday();
 
