@@ -742,20 +742,12 @@ async function sheetGet() {
 // ─────────────────────────────────────────────────────────────
 // PUSH LOG TO SHEET  (fire-and-forget)
 // ─────────────────────────────────────────────────────────────
-async function pushLogToSheet(log) {
+function pushLogToSheet(log) {
   if (!sheetURL) return;
-  try {
-    const params = new URLSearchParams();
-    params.append('action', 'recordPractice');
-    params.append('data', JSON.stringify({ action: 'recordPractice', fecha: todayKey() }));
-    const r = await fetch(sheetURL, { method: 'POST', body: params });
-    const text = await r.text();
-    const data = JSON.parse(text);
-    if (data && data.ok && typeof data.streak === 'number') {
-      renderStreakPill(data.streak);
-      document.getElementById('r-streak').textContent = `🔥 ${data.streak} día${data.streak !== 1 ? 's' : ''}`;
-    }
-  } catch(e) {}
+  const params = new URLSearchParams();
+  params.append('action', 'recordPractice');
+  params.append('data', JSON.stringify({ action: 'recordPractice', fecha: todayKey() }));
+  fetch(sheetURL, { method: 'POST', body: params }).catch(() => {});
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1275,8 +1267,8 @@ function showResults() {
   // 3. Update the pill in the home screen
   renderStreakPill(streak);
 
-  // 4. Push log to Sheet y actualizar streak desde sheet
-  await pushLogToSheet(log);
+  // 4. Push the updated log to the Sheet (fire-and-forget)
+  pushLogToSheet(log);
 
   // 5. Build result screen
   const pct = pQueue.length ? Math.round((pCorrect / pQueue.length) * 100) : 0;
