@@ -706,7 +706,7 @@ function renderStreakPill(streak) {
   pill.textContent = `🔥 ${n} día${n !== 1 ? 's' : ''}`;
 
   const lastPracticed = ls(LASTPRACTICEDK);
-  const practicedToday = lastPracticed === todayKey();
+  const practicedToday = lastPracticed === todayKey() && n > 0;
 
   if (practicedToday) {
     pill.style.background = 'rgba(193,105,214,0.2)';
