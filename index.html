@@ -701,7 +701,22 @@ function calcStreak(log) {
 
 function renderStreakPill(streak) {
   const n = streak || 0;
-  document.getElementById('streak-pill').textContent = `🔥 ${n} día${n !== 1 ? 's' : ''}`;
+  const pill = document.getElementById('streak-pill');
+  pill.textContent = `🔥 ${n} día${n !== 1 ? 's' : ''}`;
+
+  const log = getLog();
+  const today = todayKey();
+  const practicedToday = log.includes(today);
+
+  if (practicedToday) {
+    pill.style.background = 'rgba(193,105,214,0.2)';
+    pill.style.color = 'var(--mist)';
+    pill.style.borderColor = 'rgba(193,105,214,0.30)';
+  } else {
+    pill.style.background = 'rgba(120,120,120,0.15)';
+    pill.style.color = 'var(--tx3)';
+    pill.style.borderColor = 'rgba(120,120,120,0.25)';
+  }
 }
 
 function refreshStreak() {
