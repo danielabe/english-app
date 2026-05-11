@@ -787,11 +787,8 @@ async function syncFromSheet(silent) {
     if (data.words     && data.words.length)     { words     = data.words;     lsJ(WK, words); }
     if (data.sentences && data.sentences.length) { sentences = data.sentences; lsJ(SK, sentences); }
 
-    // Merge remote log into local — union, keep all dates from both sides
-    if (typeof data.streak === 'number') {
-      // Sheet tiene la racha — si es mayor que la local, actualizamos el log local
-      // para que coincida (no podemos reconstruir las fechas, pero sí la racha)
-      refreshStreak();
+     if (typeof data.streak === 'number') {
+      renderStreakPill(data.streak);
     }
 
     setSyncStatus('ok', 'Synced with Sheet ✓');
