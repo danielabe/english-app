@@ -594,6 +594,7 @@ const SK    = 'lingo_sentences';
 const SHEETK= 'lingo_sheet_url';
 const LOGK  = 'lingo_practice_log'; // stores sorted array of 'YYYY-MM-DD' strings
 const STREAKK = 'lingo_streak_cache';
+const LASTPRACTICEDK = 'lingo_last_practiced';
 
 let words = [], sentences = [], sheetURL = '', lastScreen = 's-home';
 let vocabTab = 'learning', typeFilter = 'all', levelFilter = 'all';
@@ -704,18 +705,19 @@ function renderStreakPill(streak) {
   const pill = document.getElementById('streak-pill');
   pill.textContent = `🔥 ${n} día${n !== 1 ? 's' : ''}`;
 
-  const log = getLog();
-  const today = todayKey();
-  const practicedToday = log.includes(today);
+  const lastPracticed = ls(LASTPRACTICEDK);
+  const practicedToday = lastPracticed === todayKey();
 
   if (practicedToday) {
     pill.style.background = 'rgba(193,105,214,0.2)';
     pill.style.color = 'var(--mist)';
     pill.style.borderColor = 'rgba(193,105,214,0.30)';
+    pill.style.filter = 'none';
   } else {
-    pill.style.background = 'rgba(120,120,120,0.15)';
+    pill.style.background = 'rgba(120,120,120,0.12)';
     pill.style.color = 'var(--tx3)';
-    pill.style.borderColor = 'rgba(120,120,120,0.25)';
+    pill.style.borderColor = 'rgba(120,120,120,0.20)';
+    pill.style.filter = 'grayscale(1) opacity(0.6)';
   }
 }
 
@@ -769,6 +771,7 @@ async function pushLogToSheet(log) {
     const data = JSON.parse(text);
     if (data && data.ok && typeof data.streak === 'number') {
       ls(STREAKK, String(data.streak));
+      if (data.streak > 0) ls(LASTPRACTICEDK, todayKey());
       renderStreakPill(data.streak);
       document.getElementById('r-streak').textContent = `🔥 ${data.streak} día${data.streak !== 1 ? 's' : ''}`;
     }
@@ -807,6 +810,7 @@ async function syncFromSheet(silent) {
 
     if (typeof data.streak === 'number') {
       ls(STREAKK, String(data.streak));
+      if (data.lastPracticed) ls(LASTPRACTICEDK, data.lastPracticed);
       renderStreakPill(data.streak);
     }
 
