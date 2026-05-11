@@ -1275,9 +1275,6 @@ async function showResults() {
   // 3. Update the pill in the home screen
   renderStreakPill(streak);
 
-  // 4. Push log to Sheet y actualizar streak desde sheet
-  await pushLogToSheet(log);
-
   // 5. Build result screen
   const pct = pQueue.length ? Math.round((pCorrect / pQueue.length) * 100) : 0;
   let title, iconBg, iconSVG;
@@ -1298,10 +1295,11 @@ async function showResults() {
   document.getElementById('r-icon').innerHTML        = iconSVG;
   document.getElementById('r-title').textContent     = title;
   document.getElementById('r-sub').textContent       = `${pct}% correct`;
-  document.getElementById('r-streak').textContent    = `🔥 ${streak} día${streak !== 1 ? 's' : ''}`;
+  document.getElementById('r-streak').textContent    = sheetURL ? '🔥 ...' : `🔥 ${streak} día${streak !== 1 ? 's' : ''}`;
   document.getElementById('r-correct').textContent   = pCorrect;
   document.getElementById('r-total').textContent     = pQueue.length;
   showScreen('s-result');
+  await pushLogToSheet();
 }
 
 // ─────────────────────────────────────────────────────────────
