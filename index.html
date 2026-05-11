@@ -593,6 +593,7 @@ const WK    = 'lingo_words';
 const SK    = 'lingo_sentences';
 const SHEETK= 'lingo_sheet_url';
 const LOGK  = 'lingo_practice_log'; // stores sorted array of 'YYYY-MM-DD' strings
+const STREAKK = 'lingo_streak_cache';
 
 let words = [], sentences = [], sheetURL = '', lastScreen = 's-home';
 let vocabTab = 'learning', typeFilter = 'all', levelFilter = 'all';
@@ -752,6 +753,7 @@ async function pushLogToSheet(log) {
     const text = await r.text();
     const data = JSON.parse(text);
     if (data && data.ok && typeof data.streak === 'number') {
+      ls(STREAKK, String(data.streak));
       renderStreakPill(data.streak);
       document.getElementById('r-streak').textContent = `🔥 ${data.streak} día${data.streak !== 1 ? 's' : ''}`;
     }
@@ -766,7 +768,8 @@ async function load() {
   sentences = lsJ(SK)    || [];
   sheetURL  = ls(SHEETK);
 
-  refreshStreak();
+  const cached = parseInt(ls(STREAKK), 10);
+  renderStreakPill(isNaN(cached) ? 0 : cached);
 
   if (sheetURL) {
     document.getElementById('sheet-status-label').textContent = 'Conectado ✓';
@@ -787,7 +790,8 @@ async function syncFromSheet(silent) {
     if (data.words     && data.words.length)     { words     = data.words;     lsJ(WK, words); }
     if (data.sentences && data.sentences.length) { sentences = data.sentences; lsJ(SK, sentences); }
 
-     if (typeof data.streak === 'number') {
+    if (typeof data.streak === 'number') {
+      ls(STREAKK, String(data.streak));
       renderStreakPill(data.streak);
     }
 
