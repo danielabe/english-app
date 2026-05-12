@@ -1207,7 +1207,7 @@ function renderQ() {
   } else if (pMode === 'fill') {
     const blank = item.example.replace(new RegExp(`\\b${item.en}\\b`, 'i'), '______');
     html = `<div class="q-label">Complete the sentence:</div>
-    <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}${item.type} ${item.pron || ''}</div></div>
+    <div class="q-card" style="text-align:left;"><div style="font-size:15px;line-height:1.7;color:var(--tx1);">${blank}</div><div style="margin-top:10px;font-size:11px;color:var(--soft);">${lvlTag}</div></div>
     <div class="mic-wrap"><input class="ans-inp" id="a-inp" placeholder="The missing word..." onkeydown="if(event.key==='Enter')checkFill()"/><button class="mic-btn" id="mic-btn" onclick="toggleMic('a-inp')" title="Speak your answer"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button></div>
     <div class="ai-box" id="ai-box"><div class="ai-label">Result</div><div class="ai-text" id="ai-txt"></div></div>
     <button class="btn-main" id="btn-check" onclick="checkFill()">Check</button>
