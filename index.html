@@ -261,7 +261,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="orb" style="width:60px;height:60px;bottom:20px;left:16px;background:rgba(143,83,191,.15);"></div>
     <div class="hdr-top">
       <span class="app-name" style="font-size:32px;">Lin<em>go</em></span>
-      <span id="streak-pill" class="hdr-pill">🔥 0 días</span>
+      <span id="streak-pill" class="hdr-pill">🔥 0 days</span>
     </div>
     <div class="hdr-sub">Hello! Shall we practice today?</div>
   </div>
@@ -388,13 +388,13 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <button class="btn-main" style="margin-bottom:20px;" onclick="addManual()">Save</button><div style="height:96px;"></div>
   </div>
   <div id="add-import" style="display:none;padding:0 16px;">
-    <div class="import-hint">Paste your PDF text line by line:<br><code>palabra tipo /pron/ frase ejemplo</code></div>
+    <div class="import-hint">Paste your PDF text line by line:<br><code>word type /pron/ example sentence</code></div>
     <textarea class="f-inp f-ta" id="imp-text" style="height:160px;" placeholder="abandoned adj /əˈbændənd/ You can usually...&#10;absence n /ˈæbsəns/ Would the Earth..."></textarea>
-    <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Import palabras</button>
+    <button class="btn-main" style="margin-top:10px;" onclick="importWords()">Import words</button>
     <div class="import-result" id="imp-result"></div><div style="height:62px;"></div>
   </div>
   <div id="add-sentences" style="display:none;padding:0 16px;">
-    <div class="import-hint">Pegá las sentences en español, una por línea o numeradas:</div>
+    <div class="import-hint">Paste your sentences in Spanish, one per line or numbered:</div>
     <textarea class="f-inp f-ta" id="fras-text" style="height:160px;" placeholder="1. She works at a large company...&#10;2. She usually does not make important decisions..."></textarea>
     <button class="btn-main" style="margin-top:10px;" onclick="importSentences()">Import sentences</button>
     <div class="import-result" id="fras-result"></div><div style="height:62px;"></div>
@@ -458,8 +458,8 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <div class="result-title" id="r-title">Well done!</div>
     <div class="result-sub" id="r-sub">Session complete</div>
     <div class="result-streak" id="r-streak-box">
-      <div class="result-streak-n" id="r-streak">🔥 0 días</div>
-      <div class="result-streak-l">racha actual</div>
+      <div class="result-streak-n" id="r-streak">🔥 0 days</div>
+      <div class="result-streak-l">current streak</div>
     </div>
     <div class="result-nums">
       <div><div class="result-num" id="r-correct">—</div><div class="result-numlabel">Correct</div></div>
@@ -791,7 +791,7 @@ async function load() {
   renderStreakPill(isNaN(cached) ? 0 : cached);
 
   if (sheetURL) {
-    document.getElementById('sheet-status-label').textContent = 'Conectado ✓';
+    document.getElementById('sheet-status-label').textContent = 'Connected ✓';
     await syncFromSheet(true);
   } else {
     if (!words.length)     words     = sampleWords();
@@ -1331,7 +1331,7 @@ function closeSyncModal(e) { if (e.target === document.getElementById('sync-moda
 async function saveSheetURL() {
   const url = document.getElementById('sheet-url-inp').value.trim(); if (!url) { showToast('Paste the script URL'); return; }
   sheetURL = url; ls(SHEETK, url);
-  document.getElementById('sheet-status-label').textContent = 'Conectado ✓';
+  document.getElementById('sheet-status-label').textContent = 'Connected ✓';
   document.getElementById('sync-modal').style.display = 'none';
   showToast('✓ URL saved — loading data...');
   await syncFromSheet(false);
