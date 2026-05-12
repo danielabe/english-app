@@ -54,8 +54,8 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
 
 .sec-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);padding:0 16px;margin:20px 0 10px;}
 
-.prac-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px;}
-.prac-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:18px 16px;cursor:pointer;transition:transform .13s,background .13s;}
+.prac-grid{display:grid;grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr;gap:10px;padding:0 16px;}
+.prac-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:18px 16px;cursor:pointer;transition:transform .13s,background .13s;min-height:130px;}
 .prac-card:active{transform:scale(.96);background:var(--surface2);}
 .prac-glyph{width:36px;height:36px;border-radius:10px;background:rgba(193,105,214,.15);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
 .prac-glyph svg{width:18px;height:18px;stroke:var(--pink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
