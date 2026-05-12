@@ -315,6 +315,7 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
   </div>
   <div style="height:32px;"></div>
   <div class="tabs">
+    <button class="tab" onclick="setVocabTab('all',this)">All</button>
     <button class="tab on" onclick="setVocabTab('learning',this)">To learn</button>
     <button class="tab" onclick="setVocabTab('learned',this)">Learned</button>
   </div>
@@ -936,7 +937,7 @@ function renderVocab() {
   const el   = document.getElementById('vocab-list');
   const pill = document.getElementById('vocab-count-pill');
   if (pill) pill.textContent = words.length + ' word' + (words.length !== 1 ? 's' : '');
-  let list = words.filter(w => w.status === vocabTab);
+  let list = vocabTab === 'all' ? [...words] : words.filter(w => w.status === vocabTab);
   if (typeFilter  !== 'all') list = list.filter(w => w.type  === typeFilter);
   if (levelFilter !== 'all') list = list.filter(w => w.level === levelFilter);
   el.innerHTML = list.length ? list.map(wHTML).join('') : `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-text">No words here yet</div></div>`;
