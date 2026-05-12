@@ -271,9 +271,9 @@ body{max-width:430px;margin:0 auto;min-height:100vh;
     <button class="sync-btn-small" onclick="syncFromSheet()">↻ Refresh</button>
   </div>
   <div class="stats">
-    <div class="stat" onclick="vocabTab='all';showScreen('s-vocab');" style="cursor:pointer;"><div class="stat-n" id="st-total">0</div><div class="stat-l">Words</div></div>
-    <div class="stat" onclick="vocabTab='learned';showScreen('s-vocab');" style="cursor:pointer;"><div class="stat-n" id="st-learned">0</div><div class="stat-l">Learned</div></div>
-    <div class="stat" onclick="showScreen('s-sentences');" style="cursor:pointer;"><div class="stat-n" id="st-sentences">0</div><div class="stat-l">Sentences</div></div>
+    <div class="stat" onclick="goToVocabTab('all')" style="cursor:pointer;"><div class="stat-n" id="st-total">0</div><div class="stat-l">Words</div></div>
+    <div class="stat" onclick="goToVocabTab('learned')" style="cursor:pointer;"><div class="stat-n" id="st-learned">0</div><div class="stat-l">Learned</div></div>
+    <div class="stat" onclick="showScreen('s-sentences')" style="cursor:pointer;"><div class="stat-n" id="st-sentences">0</div><div class="stat-l">Sentences</div></div>
   </div>
   <div class="sec-label">Practice</div>
   <div class="prac-grid">
@@ -1426,10 +1426,10 @@ async function testRecord() {
 
 function goToVocabTab(tab) {
   vocabTab = tab;
-  showScreen('s-vocab');
   document.querySelectorAll('#s-vocab .tab').forEach(b => b.classList.remove('on'));
   const idx = tab === 'all' ? 0 : tab === 'learning' ? 1 : 2;
   document.querySelectorAll('#s-vocab .tab')[idx].classList.add('on');
+  showScreen('s-vocab');
 }
 // ─────────────────────────────────────────────────────────────
 // INIT
